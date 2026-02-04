@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Laminas\Router\Http;
 
 use Laminas\Router\Exception;
-use Laminas\Stdlib\ArrayUtils;
+use Laminas\Router\RouteConfigTrait;
 use Laminas\Stdlib\RequestInterface as Request;
-use Traversable;
 
 use function is_array;
-use function sprintf;
 
 /**
  * Placeholder route.
  */
 class Placeholder implements RouteInterface
 {
+    use RouteConfigTrait;
+
     /** @internal */
     private ?int $priority;
 
@@ -35,20 +35,11 @@ class Placeholder implements RouteInterface
      */
     public static function factory($options = [])
     {
-        if ($options instanceof Traversable) {
-            $options = ArrayUtils::iteratorToArray($options);
-        }
-
-        if (! is_array($options)) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s expects an array or Traversable set of options',
-                __METHOD__
-            ));
-        }
-
-        if (! isset($options['defaults'])) {
-            $options['defaults'] = [];
-        }
+        $options = self::processRouteOptions(
+            $options,
+            [],
+            ['defaults' => []],
+        );
 
         if (! is_array($options['defaults'])) {
             throw new Exception\InvalidArgumentException('options[defaults] expected to be an array if set');

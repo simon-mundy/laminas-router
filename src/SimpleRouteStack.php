@@ -43,7 +43,7 @@ class SimpleRouteStack implements RouteStackInterface
      * @param iterable|array $options
      * @throws Exception\InvalidArgumentException
      */
-    public static function factory(iterable $options = []): SimpleRouteStack
+    public static function factory(iterable $options = []): RouteStackInterface
     {
         if (! is_array($options)) {
             $options = ArrayUtils::iteratorToArray($options);
@@ -109,7 +109,7 @@ class SimpleRouteStack implements RouteStackInterface
     }
 
     /** @inheritDoc */
-    public function addRoute($name, iterable|RouteInterface $route, $priority = null): RouteStackInterface
+    public function addRoute(string $name, iterable|RouteInterface $route, ?int $priority = null): RouteStackInterface
     {
         if (! $route instanceof RouteInterface) {
             $route = $this->routeFromIterable($route);

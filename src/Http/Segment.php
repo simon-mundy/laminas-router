@@ -138,7 +138,11 @@ class Segment implements RouteInterface
      */
     public static function factory(iterable $options = []): Segment
     {
-        $options = self::processRouteOptions($options);
+        $options = self::processRouteOptions(
+            $options,
+            ['route'],
+            ['constraints' => [], 'defaults' => []],
+        );
 
         return new static(
             $options['route'],
@@ -403,10 +407,8 @@ class Segment implements RouteInterface
      * assemble(): Defined by RouteInterface interface.
      *
      * @see    \Laminas\Router\RouteInterface::assemble()
-     *
-     * @return mixed
      */
-    public function assemble(array $params = [], array $options = [])
+    public function assemble(array $params = [], array $options = []): string
     {
         $this->assembledParams = [];
 

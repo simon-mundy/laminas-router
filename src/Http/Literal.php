@@ -5,91 +5,59 @@ declare(strict_types=1);
 namespace Laminas\Router\Http;
 
 use Laminas\Router\Exception;
-use Laminas\Stdlib\ArrayUtils;
+use Laminas\Router\RouteConfigTrait;
 use Laminas\Stdlib\RequestInterface as Request;
-use Traversable;
 
-use function is_array;
 use function method_exists;
-use function sprintf;
 use function strlen;
 use function strpos;
 
 /**
  * Literal route.
  */
-class Literal implements RouteInterface
+final class Literal implements RouteInterface
 {
-    /**
-     * Default values.
-     *
-     * @var array
-     */
-    protected $defaults;
+    use RouteConfigTrait;
 
     /**
      * @internal
-     * @deprecated Since 3.9.0 This property will be removed or made private in version 4.0
-     *
-     * @var int|null
      */
-    public $priority;
+    private ?int $priority;
 
     /**
      * Create a new literal route.
-     *
-     * @param  string $route
      */
     public function __construct(
-        /**
-         * RouteInterface to match.
-         */
-        protected $route,
-        array $defaults = []
+        protected string $route,
+        protected array $defaults = []
     ) {
-        $this->defaults = $defaults;
     }
 
     /**
      * factory(): defined by RouteInterface interface.
      *
-     * @see    \Laminas\Router\RouteInterface::factory()
-     *
-     * @param  iterable $options
-     * @return Literal
+     * @param iterable|array $options
      * @throws Exception\InvalidArgumentException
+     * @return Literal
+     * @see    \Laminas\Router\RouteInterface::factory()
      */
-    public static function factory($options = [])
+    public static function factory(iterable $options = []): RouteInterface
     {
-        if ($options instanceof Traversable) {
-            $options = ArrayUtils::iteratorToArray($options);
-        } elseif (! is_array($options)) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s expects an array or Traversable set of options',
-                __METHOD__
-            ));
-        }
+        $options = self::processRouteOptions(
+            $options,
+            ['route'],
+            ['defaults' => []],
+        );
 
-        if (! isset($options['route'])) {
-            throw new Exception\InvalidArgumentException('Missing "route" in options array');
-        }
-
-        if (! isset($options['defaults'])) {
-            $options['defaults'] = [];
-        }
-
-        return new static($options['route'], $options['defaults']);
+        return new Literal($options['route'], $options['defaults']);
     }
 
     /**
      * match(): defined by RouteInterface interface.
      *
      * @see    \Laminas\Router\RouteInterface::match()
-     *
-     * @param  integer|null $pathOffset
-     * @return RouteMatch|null
      */
-    public function match(Request $request, $pathOffset = null)
+    public function match(Request $request, ?int $pathOffset = null): ?RouteMatch
     {
         if (! method_exists($request, 'getUri')) {
             return null;
@@ -119,10 +87,8 @@ class Literal implements RouteInterface
      * assemble(): Defined by RouteInterface interface.
      *
      * @see    \Laminas\Router\RouteInterface::assemble()
-     *
-     * @return mixed
      */
-    public function assemble(array $params = [], array $options = [])
+    public function assemble(array $params = [], array $options = []): string
     {
         return $this->route;
     }
@@ -130,11 +96,10 @@ class Literal implements RouteInterface
     /**
      * getAssembledParams(): defined by RouteInterface interface.
      *
-     * @see    RouteInterface::getAssembledParams
-     *
      * @return array
+     * @see    RouteInterface::getAssembledParams
      */
-    public function getAssembledParams()
+    public function getAssembledParams(): array
     {
         return [];
     }

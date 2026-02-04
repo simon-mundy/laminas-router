@@ -7,6 +7,7 @@ namespace Laminas\Router\Http;
 use ArrayObject;
 use Laminas\Router\Exception;
 use Laminas\Router\PriorityList;
+use Laminas\Router\RouteConfigTrait;
 use Laminas\Router\RoutePluginManager;
 use Laminas\Stdlib\ArrayUtils;
 use Laminas\Stdlib\RequestInterface as Request;
@@ -14,9 +15,7 @@ use Traversable;
 
 use function array_diff_key;
 use function array_flip;
-use function is_array;
 use function method_exists;
-use function sprintf;
 use function strlen;
 
 /**
@@ -25,6 +24,8 @@ use function strlen;
  */
 class Part extends TreeRouteStack implements RouteInterface
 {
+    use RouteConfigTrait;
+
     /**
      * RouteInterface to match.
      *
@@ -86,32 +87,13 @@ class Part extends TreeRouteStack implements RouteInterface
      */
     public static function factory(iterable|array $options = [])
     {
-        if ($options instanceof Traversable) {
-            $options = ArrayUtils::iteratorToArray($options);
-        } elseif (! is_array($options)) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s expects an array or Traversable set of options',
-                __METHOD__
-            ));
-        }
+        $options = self::processRouteOptions(
+            $options,
+            ['route', 'route_plugins'],
+            ['prototypes' => null, 'may_terminate' => false, 'child_routes' => null],
+        );
 
-        if (! isset($options['route'])) {
-            throw new Exception\InvalidArgumentException('Missing "route" in options array');
-        }
-
-        if (! isset($options['route_plugins'])) {
-            throw new Exception\InvalidArgumentException('Missing "route_plugins" in options array');
-        }
-
-        if (! isset($options['prototypes'])) {
-            $options['prototypes'] = null;
-        }
-
-        if (! isset($options['may_terminate'])) {
-            $options['may_terminate'] = false;
-        }
-
-        if (! isset($options['child_routes']) || ! $options['child_routes']) {
+        if (! $options['child_routes']) {
             $options['child_routes'] = null;
         }
 

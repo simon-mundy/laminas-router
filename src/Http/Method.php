@@ -5,16 +5,13 @@ declare(strict_types=1);
 namespace Laminas\Router\Http;
 
 use Laminas\Router\Exception;
-use Laminas\Stdlib\ArrayUtils;
+use Laminas\Router\RouteConfigTrait;
 use Laminas\Stdlib\RequestInterface as Request;
-use Traversable;
 
 use function array_map;
 use function explode;
 use function in_array;
-use function is_array;
 use function method_exists;
-use function sprintf;
 use function strtoupper;
 
 /**
@@ -22,6 +19,8 @@ use function strtoupper;
  */
 class Method implements RouteInterface
 {
+    use RouteConfigTrait;
+
     /**
      * Default values.
      *
@@ -63,22 +62,11 @@ class Method implements RouteInterface
      */
     public static function factory($options = [])
     {
-        if ($options instanceof Traversable) {
-            $options = ArrayUtils::iteratorToArray($options);
-        } elseif (! is_array($options)) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s expects an array or Traversable set of options',
-                __METHOD__
-            ));
-        }
-
-        if (! isset($options['verb'])) {
-            throw new Exception\InvalidArgumentException('Missing "verb" in options array');
-        }
-
-        if (! isset($options['defaults'])) {
-            $options['defaults'] = [];
-        }
+        $options = self::processRouteOptions(
+            $options,
+            ['verb'],
+            ['defaults' => []],
+        );
 
         return new static($options['verb'], $options['defaults']);
     }

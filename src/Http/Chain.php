@@ -31,10 +31,8 @@ final class Chain extends TreeRouteStack implements RouteInterface
 
     /**
      * Chain routes.
-     *
-     * @var array
      */
-    protected array $chainRoutes;
+    protected ?array $chainRoutes = null;
 
     /**
      * List of assembled parameters.
@@ -62,10 +60,9 @@ final class Chain extends TreeRouteStack implements RouteInterface
      *
      * @param iterable|array $options
      * @throws Exception\InvalidArgumentException
-     * @return Chain
      * @see    \Laminas\Router\RouteInterface::factory()
      */
-    public static function factory(iterable $options = [])
+    public static function factory(iterable $options = []): TreeRouteStack
     {
         $options = self::processRouteOptions(
             $options,
@@ -134,10 +131,10 @@ final class Chain extends TreeRouteStack implements RouteInterface
     /**
      * assemble(): Defined by RouteInterface interface.
      *
-     * @return mixed
+     * @param array<array-key, mixed> $params
      * @see    \Laminas\Router\RouteInterface::assemble()
      */
-    public function assemble(array $params = [], array $options = [])
+    public function assemble(array $params = [], array $options = []): string
     {
         if ($this->chainRoutes !== null) {
             $this->addRoutes($this->chainRoutes);
@@ -168,10 +165,9 @@ final class Chain extends TreeRouteStack implements RouteInterface
     /**
      * getAssembledParams(): defined by RouteInterface interface.
      *
-     * @return array
      * @see    RouteInterface::getAssembledParams
      */
-    public function getAssembledParams()
+    public function getAssembledParams(): array
     {
         return $this->assembledParams;
     }

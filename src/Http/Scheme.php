@@ -5,88 +5,51 @@ declare(strict_types=1);
 namespace Laminas\Router\Http;
 
 use Laminas\Router\Exception;
-use Laminas\Stdlib\ArrayUtils;
+use Laminas\Router\RouteConfigTrait;
 use Laminas\Stdlib\RequestInterface as Request;
-use Traversable;
 
-use function is_array;
 use function method_exists;
-use function sprintf;
 
 /**
  * Scheme route.
  */
-class Scheme implements RouteInterface
+final class Scheme implements RouteInterface
 {
-    /**
-     * Default values.
-     *
-     * @var array
-     */
-    protected $defaults;
+    use RouteConfigTrait;
 
-    /**
-     * @internal
-     * @deprecated Since 3.9.0 This property will be removed or made private in version 4.0
-     *
-     * @var int|null
-     */
-    public $priority;
+    /** @internal */
+    private ?int $priority = null;
 
-    /**
-     * Create a new scheme route.
-     *
-     * @param  string $scheme
-     */
     public function __construct(
-        /**
-         * Scheme to match.
-         */
-        protected $scheme,
-        array $defaults = []
+        protected string $scheme,
+        protected array $defaults = []
     ) {
-        $this->defaults = $defaults;
     }
 
     /**
      * factory(): defined by RouteInterface interface.
      *
-     * @see    \Laminas\Router\RouteInterface::factory()
-     *
-     * @param  iterable $options
-     * @return Scheme
+     * @param  iterable|array $options
      * @throws Exception\InvalidArgumentException
+     * @see    \Laminas\Router\RouteInterface::factory()
      */
-    public static function factory($options = [])
+    public static function factory(iterable $options = []): Scheme
     {
-        if ($options instanceof Traversable) {
-            $options = ArrayUtils::iteratorToArray($options);
-        } elseif (! is_array($options)) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s expects an array or Traversable set of options',
-                __METHOD__
-            ));
-        }
+        $options = self::processRouteOptions(
+            $options,
+            ['scheme'],
+            ['defaults' => []],
+        );
 
-        if (! isset($options['scheme'])) {
-            throw new Exception\InvalidArgumentException('Missing "scheme" in options array');
-        }
-
-        if (! isset($options['defaults'])) {
-            $options['defaults'] = [];
-        }
-
-        return new static($options['scheme'], $options['defaults']);
+        return new Scheme($options['scheme'], $options['defaults']);
     }
 
     /**
      * match(): defined by RouteInterface interface.
      *
      * @see    \Laminas\Router\RouteInterface::match()
-     *
-     * @return RouteMatch|null
      */
-    public function match(Request $request)
+    public function match(Request $request): ?RouteMatch
     {
         if (! method_exists($request, 'getUri')) {
             return null;
@@ -109,7 +72,7 @@ class Scheme implements RouteInterface
      *
      * @return mixed
      */
-    public function assemble(array $params = [], array $options = [])
+    public function assemble(array $params = [], array $options = []): string
     {
         if (isset($options['uri'])) {
             $options['uri']->setScheme($this->scheme);
@@ -126,7 +89,7 @@ class Scheme implements RouteInterface
      *
      * @return array
      */
-    public function getAssembledParams()
+    public function getAssembledParams(): array
     {
         return [];
     }

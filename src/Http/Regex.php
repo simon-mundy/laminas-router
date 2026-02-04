@@ -6,19 +6,16 @@ namespace Laminas\Router\Http;
 
 use Laminas\Router\Exception;
 use Laminas\Router\Exception\InvalidArgumentException;
-use Laminas\Stdlib\ArrayUtils;
+use Laminas\Router\RouteConfigTrait;
 use Laminas\Stdlib\RequestInterface as Request;
-use Traversable;
 
 use function array_merge;
-use function is_array;
 use function is_int;
 use function is_numeric;
 use function method_exists;
 use function preg_match;
 use function rawurldecode;
 use function rawurlencode;
-use function sprintf;
 use function str_contains;
 use function str_replace;
 use function strlen;
@@ -28,6 +25,8 @@ use function strlen;
  */
 class Regex implements RouteInterface
 {
+    use RouteConfigTrait;
+
     /**
      * Default values.
      *
@@ -83,26 +82,11 @@ class Regex implements RouteInterface
      */
     public static function factory($options = [])
     {
-        if ($options instanceof Traversable) {
-            $options = ArrayUtils::iteratorToArray($options);
-        } elseif (! is_array($options)) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s expects an array or Traversable set of options',
-                __METHOD__
-            ));
-        }
-
-        if (! isset($options['regex'])) {
-            throw new Exception\InvalidArgumentException('Missing "regex" in options array');
-        }
-
-        if (! isset($options['spec'])) {
-            throw new Exception\InvalidArgumentException('Missing "spec" in options array');
-        }
-
-        if (! isset($options['defaults'])) {
-            $options['defaults'] = [];
-        }
+        $options = self::processRouteOptions(
+            $options,
+            ['regex', 'spec'],
+            ['defaults' => []],
+        );
 
         return new static($options['regex'], $options['spec'], $options['defaults']);
     }

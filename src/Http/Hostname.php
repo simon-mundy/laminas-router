@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Laminas\Router\Http;
 
 use Laminas\Router\Exception;
-use Laminas\Router\RouterConfigTrait;
+use Laminas\Router\RouteConfigTrait;
 use Laminas\Stdlib\RequestInterface as Request;
 use Laminas\Uri\UriInterface;
 
@@ -38,7 +38,7 @@ use function strlen;
  */
 class Hostname implements RouteInterface
 {
-    use RouterConfigTrait;
+    use RouteConfigTrait;
 
     /**
      * Parts of the route.
@@ -104,7 +104,11 @@ class Hostname implements RouteInterface
      */
     public static function factory(iterable $options = []): Hostname
     {
-        $options = self::processRouteOptions($options);
+        $options = self::processRouteOptions(
+            $options,
+            ['route'],
+            ['constraints' => [], 'defaults' => []],
+        );
 
         return new static($options['route'], $options['constraints'], $options['defaults']);
     }
