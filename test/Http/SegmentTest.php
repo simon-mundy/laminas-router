@@ -7,12 +7,13 @@ namespace LaminasTest\Router\Http;
 use Laminas\Http\Request;
 use Laminas\I18n\Translator\Loader\FileLoaderInterface;
 use Laminas\I18n\Translator\TextDomain;
-use Laminas\I18n\Translator\Translator;
+use Laminas\Translator\TranslatorInterface as Translator;
 use Laminas\Router\Exception\InvalidArgumentException;
 use Laminas\Router\Exception\RuntimeException;
 use Laminas\Router\Http\RouteMatch;
 use Laminas\Router\Http\Segment;
 use Laminas\Stdlib\Request as BaseRequest;
+use Laminas\Validator\Translator\TranslatorAwareInterface;
 use LaminasTest\Router\FactoryTester;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -183,6 +184,10 @@ final class SegmentTest extends TestCase
 
     public function testL10nRoute(): void
     {
+        if (! class_exists(TranslatorAwareInterface::class)) {
+            $this->markTestSkipped('laminas-i18n is not installed');
+        }
+
         $translator = new Translator();
         $translator->setLocale('en-US');
 

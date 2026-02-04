@@ -46,9 +46,6 @@ final class ChainTest extends TestCase
                         ],
                     ],
                 ],
-                [
-                    'type' => Wildcard::class,
-                ],
             ],
             $routePlugins
         );

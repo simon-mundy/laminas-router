@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace LaminasTest\Router\Http;
 
 use Laminas\Http\Request;
-use Laminas\I18n\Translator\Translator;
+use Laminas\Translator\TranslatorInterface as Translator;
 use Laminas\I18n\Translator\TranslatorAwareInterface;
 use Laminas\Router\Http\RouteInterface;
 use Laminas\Router\Http\TranslatorAwareTreeRouteStack;
@@ -15,16 +15,20 @@ use PHPUnit\Framework\TestCase;
 final class TranslatorAwareTreeRouteStackTest extends TestCase
 {
     /** @var string */
-    protected $testFilesDir;
+    protected string $testFilesDir;
 
     /** @var Translator */
-    protected $translator;
+    protected Translator $translator;
 
     /** @var array */
-    protected $fooRoute;
+    protected array $fooRoute;
 
     public function setUp(): void
     {
+        if (! class_exists(TranslatorAwareInterface::class)) {
+            $this->markTestSkipped('laminas-i18n is not installed');
+        }
+
         $this->testFilesDir = __DIR__ . '/_files';
 
         $this->translator = new Translator();

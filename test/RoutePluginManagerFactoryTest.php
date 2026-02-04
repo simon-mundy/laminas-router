@@ -7,7 +7,6 @@ namespace LaminasTest\Router;
 use Laminas\Router\RouteInterface;
 use Laminas\Router\RoutePluginManager;
 use Laminas\Router\RoutePluginManagerFactory;
-use Laminas\ServiceManager\ServiceLocatorInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
@@ -27,14 +26,6 @@ final class RoutePluginManagerFactoryTest extends TestCase
     public function testInvocationReturnsAPluginManager()
     {
         $plugins = $this->factory->__invoke($this->container, RoutePluginManager::class);
-        $this->assertInstanceOf(RoutePluginManager::class, $plugins);
-    }
-
-    public function testCreateServiceReturnsAPluginManager()
-    {
-        $container = $this->createMock(ServiceLocatorInterface::class);
-
-        $plugins = $this->factory->createService($container);
         $this->assertInstanceOf(RoutePluginManager::class, $plugins);
     }
 
