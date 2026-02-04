@@ -23,7 +23,7 @@ use function strlen;
 /**
  * Regex route.
  */
-class Regex implements RouteInterface
+final class Regex implements RouteInterface
 {
     use RouteConfigTrait;
     use RoutePriorityTrait;

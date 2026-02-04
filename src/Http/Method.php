@@ -18,7 +18,7 @@ use function strtoupper;
 /**
  * Method route.
  */
-class Method implements RouteInterface
+final class Method implements RouteInterface
 {
     use RouteConfigTrait;
     use RoutePriorityTrait;

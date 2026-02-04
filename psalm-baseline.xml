@@ -103,9 +103,6 @@
     <PossiblyInvalidArrayOffset>
       <code><![CDATA[$levelParts[$level][count($levelParts[$level]) - 1]]]></code>
     </PossiblyInvalidArrayOffset>
-    <UnsafeInstantiation>
-      <code><![CDATA[new static($options['route'], $options['constraints'], $options['defaults'])]]></code>
-    </UnsafeInstantiation>
     <UnsupportedReferenceUsage>
       <code><![CDATA[$levelParts[$level + 1] = &$levelParts[$level][count($levelParts[$level]) - 1][1]]]></code>
     </UnsupportedReferenceUsage>
@@ -130,9 +127,6 @@
       <code><![CDATA[$options['verb']]]></code>
       <code><![CDATA[$request->getMethod()]]></code>
     </MixedArgument>
-    <UnsafeInstantiation>
-      <code><![CDATA[new static($options['verb'], $options['defaults'])]]></code>
-    </UnsafeInstantiation>
   </file>
   <file src="src/Http/Part.php">
     <MixedArgument>
@@ -171,15 +165,6 @@
       <code><![CDATA[match]]></code>
       <code><![CDATA[match]]></code>
     </TooManyArguments>
-    <UnsafeInstantiation>
-      <code><![CDATA[new static(
-            $options['route'],
-            $options['may_terminate'],
-            $options['route_plugins'],
-            $options['child_routes'],
-            $options['prototypes']
-        )]]></code>
-    </UnsafeInstantiation>
   </file>
   <file src="src/Http/Regex.php">
     <MixedArgument>
@@ -201,9 +186,6 @@
       <code><![CDATA[is_int($key)]]></code>
       <code><![CDATA[is_numeric($key) || is_int($key)]]></code>
     </TypeDoesNotContainType>
-    <UnsafeInstantiation>
-      <code><![CDATA[new static($options['regex'], $options['spec'], $options['defaults'])]]></code>
-    </UnsafeInstantiation>
   </file>
   <file src="src/Http/Scheme.php">
     <MixedArgument>
@@ -308,13 +290,6 @@
     <UndefinedClass>
       <code><![CDATA[Translator]]></code>
     </UndefinedClass>
-    <UnsafeInstantiation>
-      <code><![CDATA[new static(
-            $options['route'],
-            $options['constraints'],
-            $options['defaults']
-        )]]></code>
-    </UnsafeInstantiation>
     <UnsupportedReferenceUsage>
       <code><![CDATA[$levelParts[$level + 1] = &$levelParts[$level][count($levelParts[$level]) - 1][1]]]></code>
     </UnsupportedReferenceUsage>
@@ -408,9 +383,6 @@
       <code><![CDATA[$config]]></code>
       <code><![CDATA[$config]]></code>
     </MixedArgumentTypeCoercion>
-    <PossiblyUnusedMethod>
-      <code><![CDATA[validatePlugin]]></code>
-    </PossiblyUnusedMethod>
     <PossiblyUnusedProperty>
       <code><![CDATA[$shareByDefault]]></code>
     </PossiblyUnusedProperty>
@@ -420,7 +392,8 @@
   </file>
   <file src="src/RoutePluginManagerFactory.php">
     <MixedArgumentTypeCoercion>
-      <code><![CDATA[$options]]></code>
+      <code><![CDATA[$options ?? []]]></code>
+      <code><![CDATA[$options ?? []]]></code>
     </MixedArgumentTypeCoercion>
   </file>
   <file src="src/RouteStackInterface.php">

@@ -37,7 +37,7 @@ use function strlen;
  *     }
  * >
  */
-class Hostname implements RouteInterface
+final class Hostname implements RouteInterface
 {
     use RouteConfigTrait;
     use RoutePriorityTrait;

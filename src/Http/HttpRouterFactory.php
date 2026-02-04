@@ -11,7 +11,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
-class HttpRouterFactory implements FactoryInterface
+final readonly class HttpRouterFactory implements FactoryInterface
 {
     use RouterConfigTrait;
 

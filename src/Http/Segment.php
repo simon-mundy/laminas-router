@@ -26,7 +26,7 @@ use function strtr;
 /**
  * Segment route.
  */
-class Segment implements RouteInterface
+final class Segment implements RouteInterface
 {
     use RouteConfigTrait;
     use RoutePriorityTrait;

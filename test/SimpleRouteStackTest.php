@@ -26,6 +26,16 @@ use Psr\Container\ContainerExceptionInterface;
 
 final class SimpleRouteStackTest extends TestCase
 {
+    private function createRoutePluginManager(): RoutePluginManager
+    {
+        return new RoutePluginManager(new ServiceManager(), [
+            'invokables' => [
+                TestAsset\DummyRoute::class          => TestAsset\DummyRoute::class,
+                TestAsset\DummyRouteWithParam::class => TestAsset\DummyRouteWithParam::class,
+            ],
+        ]);
+    }
+
     public function testSetRoutePluginManager()
     {
         $routes = new RoutePluginManager(new ServiceManager());
@@ -127,12 +137,9 @@ final class SimpleRouteStackTest extends TestCase
     /**
      * @throws ContainerExceptionInterface
      */
-    /**
-     * @throws ContainerExceptionInterface
-     */
     public function testAddRouteAsArrayWithoutOptions()
     {
-        $stack = new SimpleRouteStack();
+        $stack = new SimpleRouteStack($this->createRoutePluginManager());
         $stack->addRoute('foo', [
             'type' => TestAsset\DummyRoute::class,
         ]);
@@ -145,7 +152,7 @@ final class SimpleRouteStackTest extends TestCase
      */
     public function testAddRouteAsArrayWithOptions()
     {
-        $stack = new SimpleRouteStack();
+        $stack = new SimpleRouteStack($this->createRoutePluginManager());
         $stack->addRoute('foo', [
             'type'    => TestAsset\DummyRoute::class,
             'options' => [],
@@ -171,7 +178,7 @@ final class SimpleRouteStackTest extends TestCase
      */
     public function testAddRouteAsArrayWithPriority()
     {
-        $stack = new SimpleRouteStack();
+        $stack = new SimpleRouteStack($this->createRoutePluginManager());
 
         $stack->addRoute('foo', [
             'type'     => TestAsset\DummyRouteWithParam::class,
@@ -189,7 +196,7 @@ final class SimpleRouteStackTest extends TestCase
      */
     public function testAddRouteWithPriority()
     {
-        $stack = new SimpleRouteStack();
+        $stack = new SimpleRouteStack($this->createRoutePluginManager());
 
         $route = new TestAsset\DummyRouteWithParam();
         $route->setPriority(2);
@@ -208,7 +215,7 @@ final class SimpleRouteStackTest extends TestCase
      */
     public function testAddRouteAsTraversable()
     {
-        $stack = new SimpleRouteStack();
+        $stack = new SimpleRouteStack($this->createRoutePluginManager());
         $stack->addRoute('foo', new ArrayIterator([
             'type' => TestAsset\DummyRoute::class,
         ]));

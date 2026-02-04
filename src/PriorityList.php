@@ -11,6 +11,6 @@ use Laminas\Stdlib\PriorityList as StdlibPriorityList;
  * @template TValue of RouteInterface
  * @template-extends StdlibPriorityList<TKey, TValue>
  */
-class PriorityList extends StdlibPriorityList
+final class PriorityList extends StdlibPriorityList
 {
 }

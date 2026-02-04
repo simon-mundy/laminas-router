@@ -22,7 +22,7 @@ use Laminas\ServiceManager\ServiceManager;
  *     route_manager: array
  * }
  */
-class ConfigProvider
+final readonly class ConfigProvider
 {
     /**
      * Provide default configuration.

@@ -22,7 +22,7 @@ use function strlen;
  * @template TRoute of RouteInterface
  * @template-extends TreeRouteStack<TRoute>
  */
-class Part extends TreeRouteStack implements RouteInterface
+final class Part extends TreeRouteStack implements RouteInterface
 {
     use RouteConfigTrait;
 

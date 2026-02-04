@@ -10,6 +10,8 @@ use Laminas\Router\Http\Literal;
 use Laminas\Router\Http\Placeholder;
 use Laminas\Router\Http\RouteMatch;
 use Laminas\Router\Http\TreeRouteStack;
+use Laminas\Router\RoutePluginManager;
+use Laminas\ServiceManager\ServiceManager;
 use Laminas\Stdlib\ArrayUtils;
 use LaminasTest\Router\FactoryTester;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -17,6 +19,15 @@ use PHPUnit\Framework\TestCase;
 
 final class PlaceholderTest extends TestCase
 {
+    private function createRoutePluginManager(): RoutePluginManager
+    {
+        return new RoutePluginManager(new ServiceManager(), [
+            'invokables' => [
+                Placeholder::class => Placeholder::class,
+            ],
+        ]);
+    }
+
     /** @var array<string, array<string, mixed>> */
     private static array $routeConfig = [
         'auth' => [
@@ -78,7 +89,8 @@ final class PlaceholderTest extends TestCase
     public function testPlaceholderDefault(array $additionalConfig, string $uri, string $expectedRouteName)
     {
         $routeConfig = ArrayUtils::merge(self::$routeConfig, $additionalConfig);
-        $router      = TreeRouteStack::factory(['routes' => $routeConfig]);
+        $router      = new TreeRouteStack($this->createRoutePluginManager());
+        $router->addRoutes($routeConfig);
 
         $request = new Request();
         $request->setUri($uri);

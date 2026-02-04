@@ -11,7 +11,7 @@ use function array_merge;
 /**
  * Part route match.
  */
-class RouteMatch extends BaseRouteMatch
+final class RouteMatch extends BaseRouteMatch
 {
     /**
      * Create a part RouteMatch with given parameters and length.
