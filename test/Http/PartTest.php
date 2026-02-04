@@ -22,6 +22,7 @@ use LaminasTest\Router\FactoryTester;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerExceptionInterface;
 
 use function strlen;
 use function strpos;
@@ -48,6 +49,9 @@ final class PartTest extends TestCase
         ]);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     */
     public static function getRoute(): Part
     {
         return new Part(
@@ -200,13 +204,8 @@ final class PartTest extends TestCase
         ];
     }
 
-    /**
-     * @param string   $path
-     * @param int|null $offset
-     * @param string   $routeName
-     */
     #[DataProvider('routeProvider')]
-    public function testMatching(Part $route, $path, $offset, $routeName, ?array $params = null)
+    public function testMatching(Part $route, string $path, ?int $offset, ?string $routeName, ?array $params = null)
     {
         $request = new Request();
         $request->setUri('http://example.com' . $path);
@@ -229,13 +228,8 @@ final class PartTest extends TestCase
         }
     }
 
-    /**
-     * @param string   $path
-     * @param int|null $offset
-     * @param string   $routeName
-     */
     #[DataProvider('routeProvider')]
-    public function testAssembling(Part $route, $path, $offset, $routeName, ?array $params = null)
+    public function testAssembling(Part $route, string $path, ?int $offset, ?string $routeName, ?array $params = null)
     {
         if ($params === null) {
             // Data which will not match are not tested for assembling.
@@ -260,6 +254,9 @@ final class PartTest extends TestCase
         self::getRoute()->assemble([], ['name' => 'baz']);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     */
     public function testBaseRouteMayNotBePartRoute()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -290,8 +287,8 @@ final class PartTest extends TestCase
         $tester->testFactory(
             Part::class,
             [
-                'route'         => 'Missing "route" in options array',
-                'route_plugins' => 'Missing "route_plugins" in options array',
+                'route'         => 'Missing "route" option',
+                'route_plugins' => 'Missing "route_plugins" option',
             ],
             [
                 'route'         => new Literal('/foo'),

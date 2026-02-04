@@ -62,13 +62,8 @@ final class LiteralTest extends TestCase
         ];
     }
 
-    /**
-     * @param        string   $path
-     * @param        int|null $offset
-     * @param        bool     $shouldMatch
-     */
     #[DataProvider('routeProvider')]
-    public function testMatching(Literal $route, $path, $offset, $shouldMatch)
+    public function testMatching(Literal $route, string $path, ?int $offset, bool $shouldMatch)
     {
         $request = new Request();
         $request->setUri('http://example.com' . $path);
@@ -85,13 +80,8 @@ final class LiteralTest extends TestCase
         }
     }
 
-    /**
-     * @param        string   $path
-     * @param        int|null $offset
-     * @param        bool     $shouldMatch
-     */
     #[DataProvider('routeProvider')]
-    public function testAssembling(Literal $route, $path, $offset, $shouldMatch)
+    public function testAssembling(Literal $route, string $path, ?int $offset, bool $shouldMatch)
     {
         if (! $shouldMatch) {
             // Data which will not match are not tested for assembling.
@@ -102,7 +92,7 @@ final class LiteralTest extends TestCase
         $result = $route->assemble();
 
         if ($offset !== null) {
-            $this->assertEquals($offset, strpos($path, (string) $result, $offset));
+            $this->assertEquals($offset, strpos($path, $result, $offset));
         } else {
             $this->assertEquals($path, $result);
         }
@@ -130,7 +120,7 @@ final class LiteralTest extends TestCase
         $tester->testFactory(
             Literal::class,
             [
-                'route' => 'Missing "route" in options array',
+                'route' => 'Missing "route" option',
             ],
             [
                 'route' => '/foo',

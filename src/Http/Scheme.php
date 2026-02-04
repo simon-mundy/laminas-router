@@ -6,6 +6,7 @@ namespace Laminas\Router\Http;
 
 use Laminas\Router\Exception;
 use Laminas\Router\RouteConfigTrait;
+use Laminas\Router\RoutePriorityTrait;
 use Laminas\Stdlib\RequestInterface as Request;
 
 use function method_exists;
@@ -16,9 +17,7 @@ use function method_exists;
 final class Scheme implements RouteInterface
 {
     use RouteConfigTrait;
-
-    /** @internal */
-    private ?int $priority = null;
+    use RoutePriorityTrait;
 
     public function __construct(
         protected string $scheme,
@@ -29,9 +28,9 @@ final class Scheme implements RouteInterface
     /**
      * factory(): defined by RouteInterface interface.
      *
-     * @param  iterable|array $options
-     * @throws Exception\InvalidArgumentException
      * @see    \Laminas\Router\RouteInterface::factory()
+     *
+     * @throws Exception\InvalidArgumentException
      */
     public static function factory(iterable $options = []): Scheme
     {
@@ -86,8 +85,6 @@ final class Scheme implements RouteInterface
      * getAssembledParams(): defined by RouteInterface interface.
      *
      * @see    RouteInterface::getAssembledParams
-     *
-     * @return array
      */
     public function getAssembledParams(): array
     {

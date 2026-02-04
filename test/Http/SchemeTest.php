@@ -68,7 +68,7 @@ final class SchemeTest extends TestCase
         $tester->testFactory(
             Scheme::class,
             [
-                'scheme' => 'Missing "scheme" in options array',
+                'scheme' => 'Missing "scheme" option',
             ],
             [
                 'scheme' => 'http',

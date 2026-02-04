@@ -210,28 +210,24 @@ final class SegmentTest extends TestCase
         $this->matchingWithL10n(
             new Segment('/{fw}', [], []),
             '/framework',
-            null,
             [],
             ['translator' => $translator]
         );
         $this->matchingWithL10n(
             new Segment('/{fw}', [], []),
             '/baukasten',
-            null,
             [],
             ['translator' => $translator, 'locale' => 'de-DE']
         );
         $this->matchingWithL10n(
             new Segment('/{fw}', [], []),
             '/fw',
-            null,
             [],
             ['translator' => $translator, 'locale' => 'fr-FR']
         );
         $this->matchingWithL10n(
             new Segment('/{fw}', [], []),
             '/fw-alternative',
-            null,
             [],
             ['translator' => $translator, 'text_domain' => 'alternative']
         );
@@ -239,28 +235,24 @@ final class SegmentTest extends TestCase
         $this->assemblingWithL10n(
             new Segment('/{fw}', [], []),
             '/framework',
-            null,
             [],
             ['translator' => $translator]
         );
         $this->assemblingWithL10n(
             new Segment('/{fw}', [], []),
             '/baukasten',
-            null,
             [],
             ['translator' => $translator, 'locale' => 'de-DE']
         );
         $this->assemblingWithL10n(
             new Segment('/{fw}', [], []),
             '/fw',
-            null,
             [],
             ['translator' => $translator, 'locale' => 'fr-FR']
         );
         $this->assemblingWithL10n(
             new Segment('/{fw}', [], []),
             '/fw-alternative',
-            null,
             [],
             ['translator' => $translator, 'text_domain' => 'alternative']
         );
@@ -337,28 +329,28 @@ final class SegmentTest extends TestCase
         $result = $route->assemble($params, $options);
 
         if ($offset !== null) {
-            $this->assertEquals($offset, strpos($path, (string) $result, $offset));
+            $this->assertEquals($offset, strpos($path, $result, $offset));
         } else {
             $this->assertEquals($path, $result);
         }
     }
 
-    /**
-     * @param        string   $path
-     * @param        int|null $offset
-     */
-    private function matchingWithL10n(Segment $route, $path, $offset, ?array $params = null, array $options = [])
-    {
+    private function matchingWithL10n(
+        Segment $route,
+        string $path,
+        ?array $params = null,
+        array $options = []
+    ): void {
         $request = new Request();
         $request->setUri('http://example.com' . $path);
-        $match = $route->match($request, $offset, $options);
+        $match = $route->match($request, null, $options);
 
         if ($params === null) {
             $this->assertNull($match);
         } else {
             $this->assertInstanceOf(RouteMatch::class, $match);
 
-            if ($offset === null) {
+            if (null === null) {
                 $this->assertEquals(strlen($path), $match->getLength());
             }
 
@@ -368,33 +360,23 @@ final class SegmentTest extends TestCase
         }
     }
 
-    /**
-     * @param        string   $path
-     * @param        int|null $offset
-     */
-    private function assemblingWithL10n(Segment $route, $path, $offset, ?array $params = null, array $options = [])
-    {
+    private function assemblingWithL10n(
+        Segment $route,
+        string $path,
+        ?array $params = null,
+        array $options = []
+    ): void {
         if ($params === null) {
             // Data which will not match are not tested for assembling.
             return;
         }
 
         $result = $route->assemble($params, $options);
-
-        if ($offset !== null) {
-            $this->assertEquals($offset, strpos($path, (string) $result, $offset));
-        } else {
-            $this->assertEquals($path, $result);
-        }
+        $this->assertEquals($path, $result);
     }
 
-    /**
-     * @param        string $route
-     * @param        string $exceptionName
-     * @param        string $exceptionMessage
-     */
     #[DataProvider('parseExceptionsProvider')]
-    public function testParseExceptions($route, $exceptionName, $exceptionMessage)
+    public function testParseExceptions(string $route, string $exceptionName, string $exceptionMessage)
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);
@@ -450,7 +432,7 @@ final class SegmentTest extends TestCase
         $tester->testFactory(
             Segment::class,
             [
-                'route' => 'Missing "route" in options array',
+                'route' => 'Missing "route" option',
             ],
             [
                 'route'       => '/:foo[/:bar{-}]',

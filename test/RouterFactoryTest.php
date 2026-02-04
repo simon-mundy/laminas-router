@@ -9,6 +9,8 @@ use Laminas\Router\RoutePluginManager;
 use Laminas\Router\RouterFactory;
 use Laminas\ServiceManager\ServiceManager;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 use function array_merge_recursive;
 
@@ -30,6 +32,10 @@ class RouterFactoryTest extends TestCase
         $this->factory = new RouterFactory();
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testFactoryCanCreateRouterBasedOnConfiguredName(): void
     {
         $config   = array_merge_recursive($this->defaultServiceConfig, [
@@ -47,6 +53,10 @@ class RouterFactoryTest extends TestCase
         $this->assertInstanceOf(TestAsset\Router::class, $router);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function testFactoryCanCreateRouterWhenOnlyHttpRouterConfigPresent(): void
     {
         $config   = array_merge_recursive($this->defaultServiceConfig, [

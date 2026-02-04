@@ -79,12 +79,8 @@ final class RegexTest extends TestCase
         ];
     }
 
-    /**
-     * @param        string   $path
-     * @param        int|null $offset
-     */
     #[DataProvider('routeProvider')]
-    public function testMatching(Regex $route, $path, $offset, ?array $params = null)
+    public function testMatching(Regex $route, string $path, ?int $offset, ?array $params = null)
     {
         $request = new Request();
         $request->setUri('http://example.com' . $path);
@@ -105,12 +101,8 @@ final class RegexTest extends TestCase
         }
     }
 
-    /**
-     * @param        string   $path
-     * @param        int|null $offset
-     */
     #[DataProvider('routeProvider')]
-    public function testAssembling(Regex $route, $path, $offset, ?array $params = null)
+    public function testAssembling(Regex $route, string $path, ?int $offset, ?array $params = null)
     {
         if ($params === null) {
             // Data which will not match are not tested for assembling.
@@ -149,8 +141,8 @@ final class RegexTest extends TestCase
         $tester->testFactory(
             Regex::class,
             [
-                'regex' => 'Missing "regex" in options array',
-                'spec'  => 'Missing "spec" in options array',
+                'regex' => 'Missing "regex" option',
+                'spec'  => 'Missing "spec" option',
             ],
             [
                 'regex' => '/foo',

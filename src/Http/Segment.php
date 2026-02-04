@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Laminas\Router\Http;
 
-use Laminas\I18n\Translator\TranslatorInterface as Translator;
+use Laminas\I18n\Translator\Translator;
 use Laminas\Router\Exception;
 use Laminas\Router\RouteConfigTrait;
+use Laminas\Router\RoutePriorityTrait;
 use Laminas\Stdlib\RequestInterface as Request;
+use Laminas\Translator\TranslatorInterface;
 
 use function array_merge;
 use function count;
@@ -27,13 +29,14 @@ use function strtr;
 class Segment implements RouteInterface
 {
     use RouteConfigTrait;
+    use RoutePriorityTrait;
 
     /**
      * Cache for the encode output.
      *
      * @var array<string, string>
      */
-    protected static $cacheEncode = [];
+    protected static array $cacheEncode = [];
 
     /**
      * Map of allowed special chars in path segments.
@@ -47,7 +50,7 @@ class Segment implements RouteInterface
      *
      * @var array<string, string>
      */
-    protected static $urlencodeCorrectionMap = [
+    protected static array $urlencodeCorrectionMap = [
         '%21' => "!", // sub-delims
         '%24' => "$", // sub-delims
         '%26' => "&", // sub-delims
@@ -69,60 +72,38 @@ class Segment implements RouteInterface
 
     /**
      * Parts of the route.
-     *
-     * @var array
      */
-    protected $parts;
+    protected array $parts;
 
     /**
      * Regex used for matching the route.
-     *
-     * @var string
      */
-    protected $regex;
+    protected string $regex;
 
     /**
      * Map from regex groups to parameter names.
-     *
-     * @var array
      */
-    protected $paramMap = [];
+    protected array $paramMap = [];
 
     /**
      * Default values.
-     *
-     * @var array
      */
-    protected $defaults;
+    protected array $defaults;
 
     /**
      * List of assembled parameters.
-     *
-     * @var array
      */
-    protected $assembledParams = [];
+    protected array $assembledParams = [];
 
     /**
      * Translation keys used in the regex.
-     *
-     * @var array
      */
-    protected $translationKeys = [];
-
-    /**
-     * @internal
-     * @deprecated Since 3.9.0 This property will be removed or made private in version 4.0
-     *
-     * @var int|null
-     */
-    public $priority;
+    protected array $translationKeys = [];
 
     /**
      * Create a new regex route.
-     *
-     * @param  string $route
      */
-    public function __construct($route, array $constraints = [], array $defaults = [])
+    public function __construct(string $route, array $constraints = [], array $defaults = [])
     {
         $this->defaults = $defaults;
         $this->parts    = $this->parseRouteDefinition($route);
@@ -154,11 +135,9 @@ class Segment implements RouteInterface
     /**
      * Parse a route definition.
      *
-     * @param  string $def
-     * @return array
      * @throws Exception\RuntimeException
      */
-    protected function parseRouteDefinition($def)
+    protected function parseRouteDefinition(string $def): array
     {
         $currentPos = 0;
         $length     = strlen($def);
@@ -229,11 +208,8 @@ class Segment implements RouteInterface
 
     /**
      * Build the matching regex from parsed parts.
-     *
-     * @param  int $groupIndex
-     * @return string
      */
-    protected function buildRegex(array $parts, array $constraints, &$groupIndex = 1)
+    protected function buildRegex(array $parts, array $constraints, int &$groupIndex = 1): string
     {
         $regex = '';
 
@@ -274,16 +250,18 @@ class Segment implements RouteInterface
     /**
      * Build a path.
      *
-     * @param  bool    $isOptional
-     * @param  bool    $hasChild
-     * @return string
      * @throws Exception\InvalidArgumentException
      * @throws Exception\RuntimeException
      */
-    protected function buildPath(array $parts, array $mergedParams, $isOptional, $hasChild, array $options)
-    {
+    protected function buildPath(
+        array $parts,
+        array $mergedParams,
+        bool $isOptional,
+        bool $hasChild,
+        array $options
+    ): string {
         if ($this->translationKeys) {
-            if (! isset($options['translator']) || ! $options['translator'] instanceof Translator) {
+            if (! isset($options['translator']) || ! $options['translator'] instanceof TranslatorInterface) {
                 throw new Exception\RuntimeException('No translator provided');
             }
 
@@ -353,13 +331,12 @@ class Segment implements RouteInterface
      *
      * @see    \Laminas\Router\RouteInterface::match()
      *
-     * @return RouteMatch|null
      * @throws Exception\RuntimeException
      */
-    public function match(Request $request, ?int $pathOffset = null, array $options = [])
+    public function match(Request $request, ?int $pathOffset = null, array $options = []): ?RouteMatch
     {
         if (! method_exists($request, 'getUri')) {
-            return;
+            return null;
         }
 
         $uri  = $request->getUri();
@@ -388,7 +365,7 @@ class Segment implements RouteInterface
         }
 
         if (! $result) {
-            return;
+            return null;
         }
 
         $matchedLength = strlen($matches[0]);
@@ -425,20 +402,16 @@ class Segment implements RouteInterface
      * getAssembledParams(): defined by RouteInterface interface.
      *
      * @see    RouteInterface::getAssembledParams
-     *
-     * @return array
      */
-    public function getAssembledParams()
+    public function getAssembledParams(): array
     {
         return $this->assembledParams;
     }
 
     /**
      * Encode a path segment.
-     *
-     * @return string
      */
-    protected function encode(string $value)
+    protected function encode(string $value): string
     {
         if (! isset(static::$cacheEncode[$value])) {
             static::$cacheEncode[$value] = rawurlencode($value);
@@ -449,11 +422,8 @@ class Segment implements RouteInterface
 
     /**
      * Decode a path segment.
-     *
-     * @param  string $value
-     * @return string
      */
-    protected function decode($value)
+    protected function decode(string $value): string
     {
         return rawurldecode($value);
     }

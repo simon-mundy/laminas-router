@@ -165,11 +165,8 @@ final class HostnameTest extends TestCase
         ];
     }
 
-    /**
-     * @param        string   $hostname
-     */
     #[DataProvider('routeProvider')]
-    public function testMatching(Hostname $route, $hostname, ?array $params = null)
+    public function testMatching(Hostname $route, string $hostname, ?array $params = null)
     {
         $request = new Request();
         $request->setUri('http://' . $hostname . '/');
@@ -186,11 +183,8 @@ final class HostnameTest extends TestCase
         }
     }
 
-    /**
-     * @param        string   $hostname
-     */
     #[DataProvider('routeProvider')]
-    public function testAssembling(Hostname $route, $hostname, ?array $params = null)
+    public function testAssembling(Hostname $route, string $hostname, ?array $params = null)
     {
         if ($params === null) {
             // Data which will not match are not tested for assembling.
@@ -267,7 +261,7 @@ final class HostnameTest extends TestCase
         $tester->testFactory(
             Hostname::class,
             [
-                'route' => 'Missing "route" in options array',
+                'route' => 'Missing "route" option',
             ],
             [
                 'route' => 'example.com',

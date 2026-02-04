@@ -9,7 +9,6 @@ use Laminas\Router\Http\Chain;
 use Laminas\Router\Http\RouteInterface;
 use Laminas\Router\Http\RouteMatch;
 use Laminas\Router\Http\Segment;
-use Laminas\Router\Http\Wildcard;
 use Laminas\Router\RoutePluginManager;
 use Laminas\ServiceManager\ServiceManager;
 use LaminasTest\Router\FactoryTester;
@@ -140,12 +139,8 @@ final class ChainTest extends TestCase
         ];
     }
 
-    /**
-     * @param        string   $path
-     * @param        int|null $offset
-     */
     #[DataProvider('routeProvider')]
-    public function testMatching(Chain $route, $path, $offset, ?array $params = null)
+    public function testMatching(Chain $route, string $path, ?int $offset, ?array $params = null)
     {
         $request = new Request();
         $request->setUri('http://example.com' . $path);
@@ -166,12 +161,8 @@ final class ChainTest extends TestCase
         }
     }
 
-    /**
-     * @param        string   $path
-     * @param        int|null $offset
-     */
     #[DataProvider('routeProvider')]
-    public function testAssembling(Chain $route, $path, $offset, ?array $params = null)
+    public function testAssembling(Chain $route, string $path, ?int $offset, ?array $params = null)
     {
         if ($params === null) {
             // Data which will not match are not tested for assembling.
@@ -181,7 +172,7 @@ final class ChainTest extends TestCase
         $result = $route->assemble($params);
 
         if ($offset !== null) {
-            $this->assertEquals($offset, strpos($path, (string) $result, $offset));
+            $this->assertEquals($offset, strpos($path, $result, $offset));
         } else {
             $this->assertEquals($path, $result);
         }
@@ -193,8 +184,8 @@ final class ChainTest extends TestCase
         $tester->testFactory(
             Chain::class,
             [
-                'routes'        => 'Missing "routes" in options array',
-                'route_plugins' => 'Missing "route_plugins" in options array',
+                'routes'        => 'Missing "routes" option',
+                'route_plugins' => 'Missing "route_plugins" option',
             ],
             [
                 'routes'        => [],

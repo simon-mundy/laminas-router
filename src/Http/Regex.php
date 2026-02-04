@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Laminas\Router\Http;
 
-use Laminas\Router\Exception;
 use Laminas\Router\Exception\InvalidArgumentException;
 use Laminas\Router\RouteConfigTrait;
+use Laminas\Router\RoutePriorityTrait;
 use Laminas\Stdlib\RequestInterface as Request;
 
 use function array_merge;
@@ -26,49 +26,29 @@ use function strlen;
 class Regex implements RouteInterface
 {
     use RouteConfigTrait;
-
-    /**
-     * Default values.
-     *
-     * @var array
-     */
-    protected $defaults;
+    use RoutePriorityTrait;
 
     /**
      * List of assembled parameters.
-     *
-     * @var array
      */
-    protected $assembledParams = [];
-
-    /**
-     * @internal
-     * @deprecated Since 3.9.0 This property will be removed or made private in version 4.0
-     *
-     * @var int|null
-     */
-    public $priority;
+    protected array $assembledParams = [];
 
     /**
      * Create a new regex route.
-     *
-     * @param  string $regex
-     * @param  string $spec
      */
     public function __construct(
         /**
          * Regex to match.
          */
-        protected $regex,
+        protected string $regex,
         /**
          * Specification for URL assembly.
          *
          * Parameters accepting substitutions should be denoted as "%key%"
          */
-        protected $spec,
-        array $defaults = []
+        protected string $spec,
+        protected array $defaults = []
     ) {
-        $this->defaults = $defaults;
     }
 
     /**
@@ -76,11 +56,10 @@ class Regex implements RouteInterface
      *
      * @see    \Laminas\Router\RouteInterface::factory()
      *
-     * @param  iterable $options
-     * @return Regex
      * @throws InvalidArgumentException
+     * @return Regex
      */
-    public static function factory($options = [])
+    public static function factory(iterable $options = []): \Laminas\Router\RouteInterface
     {
         $options = self::processRouteOptions(
             $options,
@@ -95,9 +74,8 @@ class Regex implements RouteInterface
      * match(): defined by RouteInterface interface.
      *
      * @param  int $pathOffset
-     * @return RouteMatch|null
      */
-    public function match(Request $request, $pathOffset = null)
+    public function match(Request $request, $pathOffset = null): ?RouteMatch
     {
         if (! method_exists($request, 'getUri')) {
             return null;
@@ -133,10 +111,8 @@ class Regex implements RouteInterface
      * assemble(): Defined by RouteInterface interface.
      *
      * @see    \Laminas\Router\RouteInterface::assemble()
-     *
-     * @return mixed
      */
-    public function assemble(array $params = [], array $options = [])
+    public function assemble(array $params = [], array $options = []): string|array
     {
         $url                   = $this->spec;
         $mergedParams          = array_merge($this->defaults, $params);
@@ -159,10 +135,8 @@ class Regex implements RouteInterface
      * getAssembledParams(): defined by RouteInterface interface.
      *
      * @see    RouteInterface::getAssembledParams
-     *
-     * @return array
      */
-    public function getAssembledParams()
+    public function getAssembledParams(): array
     {
         return $this->assembledParams;
     }

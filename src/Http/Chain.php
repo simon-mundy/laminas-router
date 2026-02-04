@@ -8,8 +8,8 @@ use ArrayObject;
 use Laminas\Router\Exception;
 use Laminas\Router\RouteConfigTrait;
 use Laminas\Router\RoutePluginManager;
-use Laminas\Stdlib\ArrayUtils;
 use Laminas\Stdlib\RequestInterface as Request;
+use Psr\Container\ContainerExceptionInterface;
 use Traversable;
 
 use function array_diff_key;
@@ -36,8 +36,6 @@ final class Chain extends TreeRouteStack implements RouteInterface
 
     /**
      * List of assembled parameters.
-     *
-     * @var array
      */
     protected array $assembledParams = [];
 
@@ -52,15 +50,17 @@ final class Chain extends TreeRouteStack implements RouteInterface
         parent::__construct($routePlugins);
 
         $this->chainRoutes = array_reverse($routes);
-        $this->prototypes  = $prototypes;
+        if ($prototypes !== null) {
+            $this->prototypes = $prototypes;
+        }
     }
 
     /**
      * factory(): defined by RouteInterface interface.
      *
-     * @param iterable|array $options
-     * @throws Exception\InvalidArgumentException
      * @see    \Laminas\Router\RouteInterface::factory()
+     *
+     * @throws Exception\InvalidArgumentException
      */
     public static function factory(iterable $options = []): TreeRouteStack
     {
@@ -71,7 +71,7 @@ final class Chain extends TreeRouteStack implements RouteInterface
         );
 
         if ($options['routes'] instanceof Traversable) {
-            $options['routes'] = ArrayUtils::iteratorToArray($options['child_routes']);
+            $options['routes'] = self::iteratorToArray($options['routes']);
         }
 
         return new Chain(
@@ -84,10 +84,13 @@ final class Chain extends TreeRouteStack implements RouteInterface
     /**
      * match(): defined by RouteInterface interface.
      *
-     * @param int|null $pathOffset
      * @see    \Laminas\Router\RouteInterface::match()
+     *
+     * @throws ContainerExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws ContainerExceptionInterface
      */
-    public function match(Request $request, $pathOffset = null, array $options = []): ?RouteMatch
+    public function match(Request $request, ?int $pathOffset = null, array $options = []): ?RouteMatch
     {
         if (! method_exists($request, 'getUri')) {
             return null;
@@ -131,8 +134,12 @@ final class Chain extends TreeRouteStack implements RouteInterface
     /**
      * assemble(): Defined by RouteInterface interface.
      *
-     * @param array<array-key, mixed> $params
      * @see    \Laminas\Router\RouteInterface::assemble()
+     *
+     * @param array<array-key, mixed> $params
+     * @throws ContainerExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws ContainerExceptionInterface
      */
     public function assemble(array $params = [], array $options = []): string
     {
@@ -143,17 +150,18 @@ final class Chain extends TreeRouteStack implements RouteInterface
 
         $this->assembledParams = [];
 
-        $routes       = ArrayUtils::iteratorToArray($this->routes);
+        $routes       = self::iteratorToArray($this->routes);
         $lastRouteKey = array_key_last($routes);
         $path         = '';
 
+        /** @psalm-suppress MixedAssignment */
         foreach ($routes as $key => $route) {
             $chainOptions = $options;
             $hasChild     = isset($options['has_child']) && is_bool($options['has_child']) && $options['has_child'];
 
             $chainOptions['has_child'] = $hasChild || $key !== $lastRouteKey;
 
-            $path   .= $route->assemble($params, $chainOptions);
+            $path  .= $route->assemble($params, $chainOptions);
             $params = array_diff_key($params, array_flip($route->getAssembledParams()));
 
             $this->assembledParams += $route->getAssembledParams();

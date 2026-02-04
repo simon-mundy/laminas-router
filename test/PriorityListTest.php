@@ -23,7 +23,7 @@ final class PriorityListTest extends TestCase
 
     public function testInsert(): void
     {
-        $this->list->insert('foo', new TestAsset\DummyRoute(), 0);
+        $this->list->insert('foo', new TestAsset\DummyRoute());
 
         $this->assertCount(1, $this->list);
 
@@ -33,8 +33,8 @@ final class PriorityListTest extends TestCase
 
     public function testRemove(): void
     {
-        $this->list->insert('foo', new TestAsset\DummyRoute(), 0);
-        $this->list->insert('bar', new TestAsset\DummyRoute(), 0);
+        $this->list->insert('foo', new TestAsset\DummyRoute());
+        $this->list->insert('bar', new TestAsset\DummyRoute());
 
         $this->assertCount(2, $this->list);
 
@@ -51,8 +51,8 @@ final class PriorityListTest extends TestCase
 
     public function testClear(): void
     {
-        $this->list->insert('foo', new TestAsset\DummyRoute(), 0);
-        $this->list->insert('bar', new TestAsset\DummyRoute(), 0);
+        $this->list->insert('foo', new TestAsset\DummyRoute());
+        $this->list->insert('bar', new TestAsset\DummyRoute());
 
         $this->assertCount(2, $this->list);
 
@@ -66,7 +66,7 @@ final class PriorityListTest extends TestCase
     {
         $route = new TestAsset\DummyRoute();
 
-        $this->list->insert('foo', $route, 0);
+        $this->list->insert('foo', $route);
 
         $this->assertEquals($route, $this->list->get('foo'));
         $this->assertNull($this->list->get('bar'));
@@ -74,9 +74,9 @@ final class PriorityListTest extends TestCase
 
     public function testLIFOOnly(): void
     {
-        $this->list->insert('foo', new TestAsset\DummyRoute(), 0);
-        $this->list->insert('bar', new TestAsset\DummyRoute(), 0);
-        $this->list->insert('baz', new TestAsset\DummyRoute(), 0);
+        $this->list->insert('foo', new TestAsset\DummyRoute());
+        $this->list->insert('bar', new TestAsset\DummyRoute());
+        $this->list->insert('baz', new TestAsset\DummyRoute());
 
         $list = iterator_to_array($this->list);
 
@@ -86,7 +86,7 @@ final class PriorityListTest extends TestCase
     public function testPriorityOnly(): void
     {
         $this->list->insert('foo', new TestAsset\DummyRoute(), 1);
-        $this->list->insert('bar', new TestAsset\DummyRoute(), 0);
+        $this->list->insert('bar', new TestAsset\DummyRoute());
         $this->list->insert('baz', new TestAsset\DummyRoute(), 2);
 
         $list = iterator_to_array($this->list);
@@ -96,8 +96,8 @@ final class PriorityListTest extends TestCase
 
     public function testLIFOWithPriority(): void
     {
-        $this->list->insert('foo', new TestAsset\DummyRoute(), 0);
-        $this->list->insert('bar', new TestAsset\DummyRoute(), 0);
+        $this->list->insert('foo', new TestAsset\DummyRoute());
+        $this->list->insert('bar', new TestAsset\DummyRoute());
         $this->list->insert('baz', new TestAsset\DummyRoute(), 1);
 
         $list = iterator_to_array($this->list);

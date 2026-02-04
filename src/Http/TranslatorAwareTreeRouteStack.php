@@ -35,10 +35,8 @@ final class TranslatorAwareTreeRouteStack extends TreeRouteStack
      * match(): defined by \Laminas\Router\RouteInterface
      *
      * @see    \Laminas\Router\RouteInterface::match()
-     *
-     * @param integer|null $pathOffset
      */
-    public function match(Request $request, $pathOffset = null, array $options = []): ?RouteMatch
+    public function match(Request $request, ?int $pathOffset = null, array $options = []): ?RouteMatch
     {
         if ($this->hasTranslator() && $this->isTranslatorEnabled() && ! isset($options['translator'])) {
             $options['translator'] = $this->getTranslator();

@@ -42,11 +42,8 @@ final class MethodTest extends TestCase
         ];
     }
 
-    /**
-     * @param string $verb
-     */
     #[DataProvider('routeProvider')]
-    public function testMatching(HttpMethod $route, $verb)
+    public function testMatching(HttpMethod $route, string $verb)
     {
         $request = new Request();
         $request->setUri('http://example.com');
@@ -70,7 +67,7 @@ final class MethodTest extends TestCase
         $tester->testFactory(
             HttpMethod::class,
             [
-                'verb' => 'Missing "verb" in options array',
+                'verb' => 'Missing "verb" option',
             ],
             [
                 'verb' => 'get',

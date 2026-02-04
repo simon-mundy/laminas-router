@@ -74,13 +74,8 @@ final class PlaceholderTest extends TestCase
         $tester->testFactory(Placeholder::class, [], []);
     }
 
-    /**
-     * @param array $additionalConfig
-     * @param string $uri
-     * @param string $expectedRouteName
-     */
     #[DataProvider('placeholderProvider')]
-    public function testPlaceholderDefault($additionalConfig, $uri, $expectedRouteName)
+    public function testPlaceholderDefault(array $additionalConfig, string $uri, string $expectedRouteName)
     {
         $routeConfig = ArrayUtils::merge(self::$routeConfig, $additionalConfig);
         $router      = TreeRouteStack::factory(['routes' => $routeConfig]);

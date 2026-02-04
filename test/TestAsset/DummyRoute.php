@@ -6,6 +6,7 @@ namespace LaminasTest\Router\TestAsset;
 
 use Laminas\Router\RouteInterface;
 use Laminas\Router\RouteMatch;
+use Laminas\Router\RoutePriorityTrait;
 use Laminas\Stdlib\RequestInterface;
 
 /**
@@ -13,17 +14,14 @@ use Laminas\Stdlib\RequestInterface;
  */
 class DummyRoute implements RouteInterface
 {
-    /** @deprecated Setting priority with a public property should be factored out in the next major */
-    public ?int $priority = null;
+    use RoutePriorityTrait;
 
     /**
      * match(): defined by RouteInterface interface.
      *
      * @see    Route::match()
-     *
-     * @return RouteMatch
      */
-    public function match(RequestInterface $request)
+    public function match(RequestInterface $request): ?RouteMatch
     {
         return new RouteMatch([]);
     }
@@ -32,10 +30,8 @@ class DummyRoute implements RouteInterface
      * assemble(): defined by RouteInterface interface.
      *
      * @see    Route::assemble()
-     *
-     * @return mixed
      */
-    public function assemble(?array $params = null, ?array $options = null)
+    public function assemble(?array $params = null, ?array $options = null): string
     {
         return '';
     }
@@ -43,10 +39,9 @@ class DummyRoute implements RouteInterface
     /**
      * factory(): defined by RouteInterface interface
      *
-     * @param iterable $options
      * @return DummyRoute
      */
-    public static function factory($options = [])
+    public static function factory(iterable $options = []): RouteInterface
     {
         return new static();
     }

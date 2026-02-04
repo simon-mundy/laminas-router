@@ -6,6 +6,7 @@ namespace Laminas\Router\Http;
 
 use Laminas\Router\Exception;
 use Laminas\Router\RouteConfigTrait;
+use Laminas\Router\RoutePriorityTrait;
 use Laminas\Stdlib\RequestInterface as Request;
 
 use function method_exists;
@@ -18,11 +19,7 @@ use function strpos;
 final class Literal implements RouteInterface
 {
     use RouteConfigTrait;
-
-    /**
-     * @internal
-     */
-    private ?int $priority;
+    use RoutePriorityTrait;
 
     /**
      * Create a new literal route.
@@ -36,10 +33,10 @@ final class Literal implements RouteInterface
     /**
      * factory(): defined by RouteInterface interface.
      *
-     * @param iterable|array $options
+     * @see    \Laminas\Router\RouteInterface::factory()
+     *
      * @throws Exception\InvalidArgumentException
      * @return Literal
-     * @see    \Laminas\Router\RouteInterface::factory()
      */
     public static function factory(iterable $options = []): RouteInterface
     {
@@ -96,7 +93,6 @@ final class Literal implements RouteInterface
     /**
      * getAssembledParams(): defined by RouteInterface interface.
      *
-     * @return array
      * @see    RouteInterface::getAssembledParams
      */
     public function getAssembledParams(): array

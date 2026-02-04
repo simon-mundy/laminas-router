@@ -18,9 +18,8 @@ final class DummyRouteWithParam extends DummyRoute
      * @see    Route::match()
      *
      * @param  int $pathOffset
-     * @return RouteMatch
      */
-    public function match(RequestInterface $request, $pathOffset = null)
+    public function match(RequestInterface $request, $pathOffset = null): RouteMatch
     {
         return new RouteMatch(['foo' => 'bar'], -4);
     }
@@ -32,7 +31,7 @@ final class DummyRouteWithParam extends DummyRoute
      *
      * @return mixed
      */
-    public function assemble(?array $params = null, ?array $options = null)
+    public function assemble(?array $params = null, ?array $options = null): string
     {
         return $params['foo'] ?? '';
     }

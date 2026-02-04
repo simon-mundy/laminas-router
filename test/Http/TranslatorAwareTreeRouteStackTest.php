@@ -5,22 +5,23 @@ declare(strict_types=1);
 namespace LaminasTest\Router\Http;
 
 use Laminas\Http\Request;
-use Laminas\Translator\TranslatorInterface as Translator;
+use Laminas\I18n\Translator\Translator;
 use Laminas\I18n\Translator\TranslatorAwareInterface;
 use Laminas\Router\Http\RouteInterface;
 use Laminas\Router\Http\TranslatorAwareTreeRouteStack;
+use Laminas\Translator\TranslatorInterface;
 use Laminas\Uri\Http as HttpUri;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerExceptionInterface;
+
+use function class_exists;
 
 final class TranslatorAwareTreeRouteStackTest extends TestCase
 {
-    /** @var string */
     protected string $testFilesDir;
 
-    /** @var Translator */
-    protected Translator $translator;
+    protected TranslatorInterface $translator;
 
-    /** @var array */
     protected array $fooRoute;
 
     public function setUp(): void
@@ -88,6 +89,9 @@ final class TranslatorAwareTreeRouteStackTest extends TestCase
         $this->assertFalse($stack->isTranslatorEnabled());
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     */
     public function testTranslatorIsPassedThroughMatchMethod(): void
     {
         $translator = new Translator();
@@ -108,6 +112,9 @@ final class TranslatorAwareTreeRouteStackTest extends TestCase
         $stack->match($request, null, ['translator' => $translator]);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     */
     public function testTranslatorIsPassedThroughAssembleMethod(): void
     {
         $translator = new Translator();
@@ -127,6 +134,9 @@ final class TranslatorAwareTreeRouteStackTest extends TestCase
         $stack->assemble([], ['name' => 'test', 'translator' => $translator, 'uri' => $uri]);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     */
     public function testAssembleRouteWithParameterLocale(): void
     {
         $stack = new TranslatorAwareTreeRouteStack();
@@ -140,6 +150,9 @@ final class TranslatorAwareTreeRouteStackTest extends TestCase
         $this->assertEquals('/en/homepage', $stack->assemble(['locale' => 'en'], ['name' => 'foo/index']));
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     */
     public function testMatchRouteWithParameterLocale(): void
     {
         $stack = new TranslatorAwareTreeRouteStack();

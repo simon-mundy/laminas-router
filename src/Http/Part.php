@@ -6,11 +6,11 @@ namespace Laminas\Router\Http;
 
 use ArrayObject;
 use Laminas\Router\Exception;
-use Laminas\Router\PriorityList;
 use Laminas\Router\RouteConfigTrait;
 use Laminas\Router\RoutePluginManager;
-use Laminas\Stdlib\ArrayUtils;
+use Laminas\Router\RouteStackInterface;
 use Laminas\Stdlib\RequestInterface as Request;
+use Psr\Container\ContainerExceptionInterface;
 use Traversable;
 
 use function array_diff_key;
@@ -27,65 +27,42 @@ class Part extends TreeRouteStack implements RouteInterface
     use RouteConfigTrait;
 
     /**
-     * RouteInterface to match.
-     *
-     * @var TRoute
-     */
-    protected $route;
-
-    /**
-     * Child routes.
-     *
-     * @var mixed
-     */
-    protected $childRoutes;
-
-    /**
      * Create a new part route.
      *
-     * @param TRoute|iterable|string           $route
-     * @param bool                             $mayTerminate
-     * @param array|null                       $childRoutes
-     * @param RoutePluginManager<TRoute>       $routePlugins
      * @param ArrayObject<string, TRoute>|null $prototypes
-     * @throws Exception\InvalidArgumentException
+     * @throws ContainerExceptionInterface
      */
     public function __construct(
-        $route,
-        /**
-         * Whether the route may terminate.
-         */
-        protected $mayTerminate,
-        RoutePluginManager $routePlugins,
-        ?array $childRoutes = null,
+        protected iterable|RouteInterface $route,
+        protected bool $mayTerminate,
+        protected RoutePluginManager $routePluginManager,
+        protected ?array $childRoutes = null,
         ?ArrayObject $prototypes = null
     ) {
-        $this->routePluginManager = $routePlugins;
+        parent::__construct($routePluginManager);
 
         if (! $route instanceof RouteInterface) {
-            $route = $this->routeFromIterable($route);
+            $this->route = $this->routeFromSpec($route);
         }
 
-        if ($route instanceof self) {
+        if ($this->route instanceof self) {
             throw new Exception\InvalidArgumentException('Base route may not be a part route');
         }
 
-        $this->route       = $route;
-        $this->childRoutes = $childRoutes;
-        $this->prototypes  = $prototypes;
-        /** @var PriorityList<string, TRoute> $this->routes */
-        $this->routes = new PriorityList();
+        if ($prototypes !== null) {
+            $this->prototypes = $prototypes;
+        }
     }
 
     /**
      * factory(): defined by RouteInterface interface.
      *
-     * @param  iterable|array $options
-     * @throws Exception\InvalidArgumentException
-     * @return Part
      * @see    \Laminas\Router\RouteInterface::factory()
+     *
+     * @throws Exception\InvalidArgumentException
+     * @throws ContainerExceptionInterface
      */
-    public static function factory(iterable|array $options = [])
+    public static function factory(iterable $options = []): RouteStackInterface
     {
         $options = self::processRouteOptions(
             $options,
@@ -98,7 +75,7 @@ class Part extends TreeRouteStack implements RouteInterface
         }
 
         if ($options['child_routes'] instanceof Traversable) {
-            $options['child_routes'] = ArrayUtils::iteratorToArray($options['child_routes']);
+            $options['child_routes'] = self::iteratorToArray($options['child_routes']);
         }
 
         return new static(
@@ -115,10 +92,12 @@ class Part extends TreeRouteStack implements RouteInterface
      *
      * @see    \Laminas\Router\RouteInterface::match()
      *
-     * @param  integer|null $pathOffset
+     * @throws ContainerExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws ContainerExceptionInterface
      * @return RouteMatch|null
      */
-    public function match(Request $request, $pathOffset = null, array $options = [])
+    public function match(Request $request, ?int $pathOffset = null, array $options = []): ?\Laminas\Router\RouteMatch
     {
         if ($pathOffset === null) {
             $pathOffset = 0;
@@ -166,10 +145,10 @@ class Part extends TreeRouteStack implements RouteInterface
      *
      * @see    \Laminas\Router\RouteInterface::assemble()
      *
-     * @return mixed
      * @throws Exception\RuntimeException
+     * @throws ContainerExceptionInterface
      */
-    public function assemble(array $params = [], array $options = [])
+    public function assemble(array $params = [], array $options = []): mixed
     {
         if ($this->childRoutes !== null) {
             $this->addRoutes($this->childRoutes);
@@ -202,10 +181,8 @@ class Part extends TreeRouteStack implements RouteInterface
      * getAssembledParams(): defined by RouteInterface interface.
      *
      * @see    RouteInterface::getAssembledParams
-     *
-     * @return array
      */
-    public function getAssembledParams()
+    public function getAssembledParams(): array
     {
         // Part routes may not occur as base route of other part routes, so we
         // don't have to return anything here.

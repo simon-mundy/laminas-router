@@ -32,11 +32,8 @@ class RouteMatch extends BaseRouteMatch
      * setMatchedRouteName(): defined by BaseRouteMatch.
      *
      * @see    BaseRouteMatch::setMatchedRouteName()
-     *
-     * @param  string $name
-     * @return RouteMatch
      */
-    public function setMatchedRouteName($name)
+    public function setMatchedRouteName(string $name): static
     {
         if ($this->matchedRouteName === null) {
             $this->matchedRouteName = $name;
@@ -49,10 +46,8 @@ class RouteMatch extends BaseRouteMatch
 
     /**
      * Merge parameters from another match.
-     *
-     * @return RouteMatch
      */
-    public function merge(RouteMatch $match)
+    public function merge(RouteMatch $match): static
     {
         $this->params  = array_merge($this->params, $match->getParams());
         $this->length += $match->getLength();
@@ -64,10 +59,8 @@ class RouteMatch extends BaseRouteMatch
 
     /**
      * Get the matched path length.
-     *
-     * @return int
      */
-    public function getLength()
+    public function getLength(): int
     {
         return $this->length;
     }

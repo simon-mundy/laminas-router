@@ -6,6 +6,7 @@ namespace Laminas\Router\Http;
 
 use Laminas\Router\Exception;
 use Laminas\Router\RouteConfigTrait;
+use Laminas\Router\RoutePriorityTrait;
 use Laminas\Stdlib\RequestInterface as Request;
 
 use function is_array;
@@ -13,12 +14,10 @@ use function is_array;
 /**
  * Placeholder route.
  */
-class Placeholder implements RouteInterface
+final class Placeholder implements RouteInterface
 {
     use RouteConfigTrait;
-
-    /** @internal */
-    private ?int $priority;
+    use RoutePriorityTrait;
 
     public function __construct(private readonly array $defaults)
     {
@@ -29,11 +28,9 @@ class Placeholder implements RouteInterface
      *
      * @see    \Laminas\Router\RouteInterface::factory()
      *
-     * @param  iterable $options
-     * @return Placeholder
      * @throws Exception\InvalidArgumentException
      */
-    public static function factory($options = [])
+    public static function factory(iterable $options = []): Placeholder
     {
         $options = self::processRouteOptions(
             $options,
@@ -45,7 +42,7 @@ class Placeholder implements RouteInterface
             throw new Exception\InvalidArgumentException('options[defaults] expected to be an array if set');
         }
 
-        return new static($options['defaults']);
+        return new Placeholder($options['defaults']);
     }
 
     /**
@@ -54,9 +51,8 @@ class Placeholder implements RouteInterface
      * @see    \Laminas\Router\RouteInterface::match()
      *
      * @param  integer|null $pathOffset
-     * @return RouteMatch|null
      */
-    public function match(Request $request, $pathOffset = null)
+    public function match(Request $request, $pathOffset = null): ?RouteMatch
     {
         return new RouteMatch($this->defaults);
     }
@@ -65,10 +61,8 @@ class Placeholder implements RouteInterface
      * assemble(): Defined by RouteInterface interface.
      *
      * @see    \Laminas\Router\RouteInterface::assemble()
-     *
-     * @return mixed
      */
-    public function assemble(array $params = [], array $options = [])
+    public function assemble(array $params = [], array $options = []): string
     {
         return '';
     }
@@ -77,10 +71,8 @@ class Placeholder implements RouteInterface
      * getAssembledParams(): defined by RouteInterface interface.
      *
      * @see    RouteInterface::getAssembledParams
-     *
-     * @return array
      */
-    public function getAssembledParams()
+    public function getAssembledParams(): array
     {
         return [];
     }

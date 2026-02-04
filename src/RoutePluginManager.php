@@ -60,6 +60,43 @@ class RoutePluginManager extends AbstractPluginManager
     }
 
     /**
+     * Validate a route plugin. (v2)
+     *
+     * @throws InvalidServiceException
+     * @psalm-assert InstanceType $instance
+     */
+    public function validate(mixed $instance): void
+    {
+        if (! $instance instanceof $this->instanceOf) {
+            throw new InvalidServiceException(sprintf(
+                'Plugin of type %s is invalid; must implement %s',
+                get_debug_type($instance),
+                RouteInterface::class
+            ));
+        }
+    }
+
+    /**
+     * Validate a route plugin.
+     *
+     * @param InstanceType $plugin
+     * @throws Exception\RuntimeException
+     * @psalm-assert InstanceType $instance
+     */
+    public function validatePlugin(RouteInterface $plugin): void
+    {
+        try {
+            $this->validate($plugin);
+        } catch (InvalidServiceException $e) {
+            throw new Exception\RuntimeException(
+                $e->getMessage(),
+                $e->getCode(),
+                $e
+            );
+        }
+    }
+
+    /**
      * Pre-process configuration.
      *
      * Checks for invokables, and, if found, maps them to the
@@ -71,7 +108,7 @@ class RoutePluginManager extends AbstractPluginManager
      */
     public function configure(array $config): static
     {
-        if (isset($config['invokables']) && ! empty($config['invokables'])) {
+        if (! empty($config['invokables'])) {
             $aliases   = $this->createAliasesForInvokables($config['invokables']);
             $factories = $this->createFactoriesForInvokables($config['invokables']);
 

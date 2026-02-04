@@ -6,6 +6,7 @@ namespace Laminas\Router\Http;
 
 use Laminas\Router\Exception;
 use Laminas\Router\RouteConfigTrait;
+use Laminas\Router\RoutePriorityTrait;
 use Laminas\Stdlib\RequestInterface as Request;
 use Laminas\Uri\UriInterface;
 
@@ -39,56 +40,39 @@ use function strlen;
 class Hostname implements RouteInterface
 {
     use RouteConfigTrait;
+    use RoutePriorityTrait;
 
     /**
      * Parts of the route.
-     *
-     * @var Parts
      */
-    protected $parts;
+    protected array $parts;
 
     /**
      * Regex used for matching the route.
-     *
-     * @var string
      */
-    protected $regex;
+    protected string $regex;
 
     /**
      * Map from regex groups to parameter names.
-     *
-     * @var array
      */
-    protected $paramMap = [];
+    protected array $paramMap = [];
 
     /**
      * Default values.
-     *
-     * @var array
      */
-    protected $defaults;
+    protected array $defaults;
 
     /**
      * List of assembled parameters.
      *
      * @var list<string>
      */
-    protected $assembledParams = [];
-
-    /**
-     * @internal
-     * @deprecated Since 3.9.0 This property will be removed or made private in version 4.0
-     *
-     * @var int|null
-     */
-    public $priority;
+    protected array $assembledParams = [];
 
     /**
      * Create a new hostname route.
-     *
-     * @param string $route
      */
-    public function __construct($route, array $constraints = [], array $defaults = [])
+    public function __construct(string $route, array $constraints = [], array $defaults = [])
     {
         $this->defaults = $defaults;
         $this->parts    = $this->parseRouteDefinition($route);
@@ -116,11 +100,10 @@ class Hostname implements RouteInterface
     /**
      * Parse a route definition.
      *
-     * @param string $def
      * @throws Exception\RuntimeException
      * @return Parts
      */
-    protected function parseRouteDefinition($def)
+    protected function parseRouteDefinition(string $def): array
     {
         $currentPos = 0;
         $length     = strlen($def);
@@ -185,11 +168,8 @@ class Hostname implements RouteInterface
 
     /**
      * Build the matching regex from parsed parts.
-     *
-     * @param int   $groupIndex
-     * @return string
      */
-    protected function buildRegex(array $parts, array $constraints, &$groupIndex = 1)
+    protected function buildRegex(array $parts, array $constraints, int &$groupIndex = 1): string
     {
         $regex = '';
 
@@ -214,7 +194,7 @@ class Hostname implements RouteInterface
                     break;
 
                 case 'optional':
-                    $regex .= '(?:' . $this->buildRegex($part[1], $constraints, $groupIndex) . ')?';
+                    $regex .= '(?:' . $this->buildRegex($part[1], $constraints, $groupIndex) . ')??';
                     break;
             }
         }
@@ -226,10 +206,8 @@ class Hostname implements RouteInterface
      * Build host.
      *
      * @param array<string, string> $mergedParams
-     * @param bool                  $isOptional
-     * @return string
      */
-    protected function buildHost(array $parts, array $mergedParams, $isOptional)
+    protected function buildHost(array $parts, array $mergedParams, bool $isOptional): string
     {
         $host      = '';
         $skip      = true;
@@ -286,10 +264,8 @@ class Hostname implements RouteInterface
      * match(): defined by RouteInterface interface.
      *
      * @see    \Laminas\Router\RouteInterface::match()
-     *
-     * @return RouteMatch|null
      */
-    public function match(Request $request)
+    public function match(Request $request): ?RouteMatch
     {
         if (! method_exists($request, 'getUri')) {
             return null;
@@ -320,10 +296,8 @@ class Hostname implements RouteInterface
      * assemble(): Defined by RouteInterface interface.
      *
      * @see    \Laminas\Router\RouteInterface::assemble()
-     *
-     * @return mixed
      */
-    public function assemble(array $params = [], array $options = [])
+    public function assemble(array $params = [], array $options = []): string
     {
         $this->assembledParams = [];
 
@@ -348,7 +322,7 @@ class Hostname implements RouteInterface
      *
      * @return list<string>
      */
-    public function getAssembledParams()
+    public function getAssembledParams(): array
     {
         return $this->assembledParams;
     }

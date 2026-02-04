@@ -6,6 +6,7 @@ namespace Laminas\Router\Http;
 
 use Laminas\Router\Exception;
 use Laminas\Router\RouteConfigTrait;
+use Laminas\Router\RoutePriorityTrait;
 use Laminas\Stdlib\RequestInterface as Request;
 
 use function array_map;
@@ -20,21 +21,12 @@ use function strtoupper;
 class Method implements RouteInterface
 {
     use RouteConfigTrait;
+    use RoutePriorityTrait;
 
     /**
      * Default values.
-     *
-     * @var array
      */
-    protected $defaults;
-
-    /**
-     * @internal
-     * @deprecated Since 3.9.0 This property will be removed or made private in version 4.0
-     *
-     * @var int|null
-     */
-    public $priority;
+    protected array $defaults;
 
     /**
      * Create a new method route.
@@ -56,11 +48,10 @@ class Method implements RouteInterface
      *
      * @see    \Laminas\Router\RouteInterface::factory()
      *
-     * @param  iterable $options
-     * @return Method
      * @throws Exception\InvalidArgumentException
+     * @return Method
      */
-    public static function factory($options = [])
+    public static function factory(iterable $options = []): \Laminas\Router\RouteInterface
     {
         $options = self::processRouteOptions(
             $options,
@@ -75,10 +66,8 @@ class Method implements RouteInterface
      * match(): defined by RouteInterface interface.
      *
      * @see    \Laminas\Router\RouteInterface::match()
-     *
-     * @return RouteMatch|null
      */
-    public function match(Request $request)
+    public function match(Request $request): ?RouteMatch
     {
         if (! method_exists($request, 'getMethod')) {
             return null;
@@ -99,10 +88,8 @@ class Method implements RouteInterface
      * assemble(): Defined by RouteInterface interface.
      *
      * @see    \Laminas\Router\RouteInterface::assemble()
-     *
-     * @return mixed
      */
-    public function assemble(array $params = [], array $options = [])
+    public function assemble(array $params = [], array $options = []): string
     {
         // The request method does not contribute to the path, thus nothing is returned.
         return '';
@@ -112,10 +99,8 @@ class Method implements RouteInterface
      * getAssembledParams(): defined by RouteInterface interface.
      *
      * @see    RouteInterface::getAssembledParams
-     *
-     * @return array
      */
-    public function getAssembledParams()
+    public function getAssembledParams(): array
     {
         return [];
     }
