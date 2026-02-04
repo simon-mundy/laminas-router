@@ -11,12 +11,12 @@ class RoutePluginManagerFactory implements FactoryInterface
 {
     /**
      * Create and return a route plugin manager.
-     *
-     * @param  string $name
-     * @param  null|array $options
      */
-    public function __invoke(ContainerInterface $container, string $requestedName, ?array $options = null): RoutePluginManager
-    {
+    public function __invoke(
+        ContainerInterface $container,
+        string $requestedName,
+        ?array $options = null
+    ): RoutePluginManager {
         $options ??= [];
         return new RoutePluginManager($container, $options);
     }

@@ -32,7 +32,7 @@ class RouterFactoryTest extends TestCase
 
     public function testFactoryCanCreateRouterBasedOnConfiguredName(): void
     {
-        $config = array_merge_recursive($this->defaultServiceConfig, [
+        $config   = array_merge_recursive($this->defaultServiceConfig, [
             'services' => [
                 'config' => [
                     'router' => [
@@ -49,7 +49,7 @@ class RouterFactoryTest extends TestCase
 
     public function testFactoryCanCreateRouterWhenOnlyHttpRouterConfigPresent(): void
     {
-        $config = array_merge_recursive($this->defaultServiceConfig, [
+        $config   = array_merge_recursive($this->defaultServiceConfig, [
             'services' => [
                 'config' => [
                     'router' => [

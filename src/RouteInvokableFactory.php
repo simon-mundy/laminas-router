@@ -27,32 +27,21 @@ class RouteInvokableFactory implements AbstractFactoryInterface
      */
     public function canCreate(ContainerInterface $container, string $requestedName): bool
     {
-        if (! class_exists($requestedName)) {
-            return false;
-        }
-
-        if (! is_subclass_of($requestedName, RouteInterface::class)) {
-            return false;
-        }
-
-        return true;
+        return class_exists($requestedName) && is_subclass_of($requestedName, RouteInterface::class);
     }
 
     /**
      * Create and return a RouteInterface instance.
-     *
      * If the specified $requestedName class does not exist or does not implement
      * RouteInterface, this method will raise an exception.
-     *
      * Otherwise, it uses the class' `factory()` method with the provided
      * $options to produce an instance.
-     *
-     * @param string $requestedName
-     * @param null|array $options
-     * @return RouteInterface
      */
-    public function __invoke(ContainerInterface $container, string $requestedName, ?array $options = null): mixed
-    {
+    public function __invoke(
+        ContainerInterface $container,
+        string $requestedName,
+        ?array $options = null
+    ): RouteInterface {
         $options ??= [];
 
         if (! class_exists($requestedName)) {

@@ -6,7 +6,7 @@ namespace Laminas\Router\Http;
 
 use ArrayObject;
 use Laminas\Router\Exception;
-use Laminas\Router\PriorityList;
+use Laminas\Router\RouteConfigTrait;
 use Laminas\Router\RoutePluginManager;
 use Laminas\Stdlib\ArrayUtils;
 use Laminas\Stdlib\RequestInterface as Request;
@@ -17,31 +17,31 @@ use function array_flip;
 use function array_key_last;
 use function array_reverse;
 use function assert;
-use function is_array;
 use function is_bool;
 use function method_exists;
-use function sprintf;
 use function strlen;
 
 /**
  * @template TRoute of RouteInterface
  * @template-extends TreeRouteStack<TRoute>
  */
-class Chain extends TreeRouteStack implements RouteInterface
+final class Chain extends TreeRouteStack implements RouteInterface
 {
+    use RouteConfigTrait;
+
     /**
      * Chain routes.
      *
      * @var array
      */
-    protected $chainRoutes;
+    protected array $chainRoutes;
 
     /**
      * List of assembled parameters.
      *
      * @var array
      */
-    protected $assembledParams = [];
+    protected array $assembledParams = [];
 
     /**
      * Create a new part route.
@@ -51,50 +51,33 @@ class Chain extends TreeRouteStack implements RouteInterface
      */
     public function __construct(array $routes, RoutePluginManager $routePlugins, ?ArrayObject $prototypes = null)
     {
-        $this->chainRoutes        = array_reverse($routes);
-        $this->routePluginManager = $routePlugins;
-        /** @var PriorityList<string, TRoute> $this->routes */
-        $this->routes     = new PriorityList();
-        $this->prototypes = $prototypes;
+        parent::__construct($routePlugins);
+
+        $this->chainRoutes = array_reverse($routes);
+        $this->prototypes  = $prototypes;
     }
 
     /**
      * factory(): defined by RouteInterface interface.
      *
-     * @see    \Laminas\Router\RouteInterface::factory()
-     *
-     * @param  mixed $options
+     * @param iterable|array $options
      * @throws Exception\InvalidArgumentException
-     * @return Part
+     * @return Chain
+     * @see    \Laminas\Router\RouteInterface::factory()
      */
-    public static function factory($options = [])
+    public static function factory(iterable $options = [])
     {
-        if ($options instanceof Traversable) {
-            $options = ArrayUtils::iteratorToArray($options);
-        } elseif (! is_array($options)) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s expects an array or Traversable set of options',
-                __METHOD__
-            ));
-        }
-
-        if (! isset($options['routes'])) {
-            throw new Exception\InvalidArgumentException('Missing "routes" in options array');
-        }
-
-        if (! isset($options['prototypes'])) {
-            $options['prototypes'] = null;
-        }
+        $options = self::processRouteOptions(
+            $options,
+            ['routes', 'route_plugins'],
+            ['prototypes' => null],
+        );
 
         if ($options['routes'] instanceof Traversable) {
             $options['routes'] = ArrayUtils::iteratorToArray($options['child_routes']);
         }
 
-        if (! isset($options['route_plugins'])) {
-            throw new Exception\InvalidArgumentException('Missing "route_plugins" in options array');
-        }
-
-        return new static(
+        return new Chain(
             $options['routes'],
             $options['route_plugins'],
             $options['prototypes']
@@ -104,15 +87,13 @@ class Chain extends TreeRouteStack implements RouteInterface
     /**
      * match(): defined by RouteInterface interface.
      *
+     * @param int|null $pathOffset
      * @see    \Laminas\Router\RouteInterface::match()
-     *
-     * @param  int|null $pathOffset
-     * @return RouteMatch|null
      */
-    public function match(Request $request, $pathOffset = null, array $options = [])
+    public function match(Request $request, $pathOffset = null, array $options = []): ?RouteMatch
     {
         if (! method_exists($request, 'getUri')) {
-            return;
+            return null;
         }
 
         if ($pathOffset === null) {
@@ -129,14 +110,14 @@ class Chain extends TreeRouteStack implements RouteInterface
 
         $match      = new RouteMatch([]);
         $uri        = $request->getUri();
-        $pathLength = strlen($uri->getPath());
+        $pathLength = strlen((string) $uri->getPath());
 
         foreach ($this->routes as $route) {
             assert($route instanceof RouteInterface);
             $subMatch = $route->match($request, $pathOffset, $options);
 
             if ($subMatch === null) {
-                return;
+                return null;
             }
 
             $match->merge($subMatch);
@@ -144,7 +125,7 @@ class Chain extends TreeRouteStack implements RouteInterface
         }
 
         if ($mustTerminate && $pathOffset !== $pathLength) {
-            return;
+            return null;
         }
 
         return $match;
@@ -153,9 +134,8 @@ class Chain extends TreeRouteStack implements RouteInterface
     /**
      * assemble(): Defined by RouteInterface interface.
      *
-     * @see    \Laminas\Router\RouteInterface::assemble()
-     *
      * @return mixed
+     * @see    \Laminas\Router\RouteInterface::assemble()
      */
     public function assemble(array $params = [], array $options = [])
     {
@@ -176,7 +156,7 @@ class Chain extends TreeRouteStack implements RouteInterface
 
             $chainOptions['has_child'] = $hasChild || $key !== $lastRouteKey;
 
-            $path  .= $route->assemble($params, $chainOptions);
+            $path   .= $route->assemble($params, $chainOptions);
             $params = array_diff_key($params, array_flip($route->getAssembledParams()));
 
             $this->assembledParams += $route->getAssembledParams();
@@ -188,9 +168,8 @@ class Chain extends TreeRouteStack implements RouteInterface
     /**
      * getAssembledParams(): defined by RouteInterface interface.
      *
-     * @see    RouteInterface::getAssembledParams
-     *
      * @return array
+     * @see    RouteInterface::getAssembledParams
      */
     public function getAssembledParams()
     {

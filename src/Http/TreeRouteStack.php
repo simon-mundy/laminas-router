@@ -11,6 +11,7 @@ use Laminas\Router\SimpleRouteStack;
 use Laminas\Stdlib\ArrayUtils;
 use Laminas\Stdlib\RequestInterface as Request;
 use Laminas\Uri\Http as HttpUri;
+use Psr\Container\ContainerExceptionInterface;
 use Traversable;
 
 use function array_merge;
@@ -52,26 +53,22 @@ class TreeRouteStack extends SimpleRouteStack
      *
      * @var ArrayObject<string, TRoute>
      */
-    protected $prototypes;
+    protected ArrayObject $prototypes;
 
     /**
      * @internal
-     * @deprecated Since 3.9.0 This property will be removed or made private in version 4.0
-     *
-     * @var int|null
      */
-    public $priority;
+    private ?int $priority = null;
 
     /**
      * factory(): defined by RouteInterface interface.
      *
-     * @see    \Laminas\Router\RouteInterface::factory()
-     *
-     * @param  iterable $options
-     * @return SimpleRouteStack
+     * @param  iterable|array $options
      * @throws Exception\InvalidArgumentException
+     * @return SimpleRouteStack
+     * @see    \Laminas\Router\RouteInterface::factory()
      */
-    public static function factory($options = [])
+    public static function factory(iterable $options = []): TreeRouteStack
     {
         if ($options instanceof Traversable) {
             $options = ArrayUtils::iteratorToArray($options);
@@ -123,10 +120,6 @@ class TreeRouteStack extends SimpleRouteStack
                 'Scheme'   => Scheme::class,
                 'segment'  => Segment::class,
                 'Segment'  => Segment::class,
-                'wildcard' => Wildcard::class,
-                'Wildcard' => Wildcard::class,
-                'wildCard' => Wildcard::class,
-                'WildCard' => Wildcard::class,
             ],
             'factories' => [
                 Chain::class    => RouteInvokableFactory::class,
@@ -137,7 +130,6 @@ class TreeRouteStack extends SimpleRouteStack
                 Regex::class    => RouteInvokableFactory::class,
                 Scheme::class   => RouteInvokableFactory::class,
                 Segment::class  => RouteInvokableFactory::class,
-                Wildcard::class => RouteInvokableFactory::class,
             ],
         ]);
     }
@@ -145,15 +137,14 @@ class TreeRouteStack extends SimpleRouteStack
     /**
      * addRoute(): defined by RouteStackInterface interface.
      *
-     * @param string                 $name
      * @param string|iterable|TRoute $route
      * @param int                    $priority
-     * @return $this
+     * @throws ContainerExceptionInterface
      */
-    public function addRoute($name, $route, $priority = null)
+    public function addRoute(string $name, $route, ?int $priority = null): static
     {
         if (! $route instanceof RouteInterface) {
-            $route = $this->routeFromArray($route);
+            $route = $this->routeFromIterable($route);
         }
 
         return parent::addRoute($name, $route, $priority);
@@ -161,13 +152,11 @@ class TreeRouteStack extends SimpleRouteStack
 
     /**
      * @inheritDoc
-     * @param  string|iterable $specs
+     * @param string|iterable $specs
+     * @throws ContainerExceptionInterface
      * @return TRoute
-     * @throws Exception\InvalidArgumentException When route definition is not an array nor traversable.
-     * @throws Exception\InvalidArgumentException When chain routes are not an array nor traversable.
-     * @throws Exception\RuntimeException         When a generated routes does not implement the HTTP route interface.
      */
-    protected function routeFromArray($specs)
+    protected function routeFromIterable($specs)
     {
         if (is_string($specs)) {
             if (null === ($route = $this->getPrototype($specs))) {
@@ -201,7 +190,7 @@ class TreeRouteStack extends SimpleRouteStack
 
             $route = $this->routePluginManager->build('chain', $options);
         } else {
-            $route = parent::routeFromArray($specs);
+            $route = parent::routeFromIterable($specs);
         }
 
         if (! $route instanceof RouteInterface) {
@@ -256,7 +245,7 @@ class TreeRouteStack extends SimpleRouteStack
     public function addPrototype($name, $route)
     {
         if (! $route instanceof RouteInterface) {
-            $route = $this->routeFromArray($route);
+            $route = $this->routeFromIterable($route);
         }
 
         $this->prototypes[$name] = $route;
@@ -294,7 +283,7 @@ class TreeRouteStack extends SimpleRouteStack
         }
 
         $uri           = $request->getUri();
-        $baseUrlLength = strlen((string) $this->baseUrl) ?: null;
+        $baseUrlLength = strlen($this->baseUrl) ?: null;
 
         if ($pathOffset !== null) {
             $baseUrlLength += $pathOffset;

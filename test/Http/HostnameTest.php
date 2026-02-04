@@ -90,7 +90,7 @@ final class HostnameTest extends TestCase
             'one-of-two-missing-optional-subdomain'                          => [
                 new Hostname('[:foo.][:bar.]example.com'),
                 'bat.example.com',
-                ['foo' => null, 'foo' => 'bat'],
+                ['foo' => null, 'bar' => 'bat'],
             ],
             'two-missing-optional-subdomain'                                 => [
                 new Hostname('[:foo.][:bar.]example.com'),

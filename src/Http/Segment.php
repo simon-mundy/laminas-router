@@ -6,13 +6,11 @@ namespace Laminas\Router\Http;
 
 use Laminas\I18n\Translator\TranslatorInterface as Translator;
 use Laminas\Router\Exception;
-use Laminas\Stdlib\ArrayUtils;
+use Laminas\Router\RouteConfigTrait;
 use Laminas\Stdlib\RequestInterface as Request;
-use Traversable;
 
 use function array_merge;
 use function count;
-use function is_array;
 use function method_exists;
 use function preg_match;
 use function preg_quote;
@@ -28,6 +26,8 @@ use function strtr;
  */
 class Segment implements RouteInterface
 {
+    use RouteConfigTrait;
+
     /**
      * Cache for the encode output.
      *
@@ -134,34 +134,17 @@ class Segment implements RouteInterface
      *
      * @see    \Laminas\Router\RouteInterface::factory()
      *
-     * @param  iterable $options
-     * @return Segment
      * @throws Exception\InvalidArgumentException
      */
-    public static function factory($options = [])
+    public static function factory(iterable $options = []): Segment
     {
-        if ($options instanceof Traversable) {
-            $options = ArrayUtils::iteratorToArray($options);
-        } elseif (! is_array($options)) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s expects an array or Traversable set of options',
-                __METHOD__
-            ));
-        }
+        $options = self::processRouteOptions($options);
 
-        if (! isset($options['route'])) {
-            throw new Exception\InvalidArgumentException('Missing "route" in options array');
-        }
-
-        if (! isset($options['constraints'])) {
-            $options['constraints'] = [];
-        }
-
-        if (! isset($options['defaults'])) {
-            $options['defaults'] = [];
-        }
-
-        return new static($options['route'], $options['constraints'], $options['defaults']);
+        return new static(
+            $options['route'],
+            $options['constraints'],
+            $options['defaults']
+        );
     }
 
     /**
@@ -366,11 +349,10 @@ class Segment implements RouteInterface
      *
      * @see    \Laminas\Router\RouteInterface::match()
      *
-     * @param  string|null $pathOffset
      * @return RouteMatch|null
      * @throws Exception\RuntimeException
      */
-    public function match(Request $request, $pathOffset = null, array $options = [])
+    public function match(Request $request, ?int $pathOffset = null, array $options = [])
     {
         if (! method_exists($request, 'getUri')) {
             return;

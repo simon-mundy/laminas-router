@@ -17,7 +17,7 @@ use Laminas\ServiceManager\ServiceManager;
  * @see ConfigInterface
  *
  * @psalm-import-type ServiceManagerConfiguration from ServiceManager
- * @psalm-type ViewConfigShape = array{
+ * @psalm-type RouterConfigShape = array{
  *     dependencies: ServiceManagerConfiguration,
  *     route_manager: array
  * }
@@ -27,9 +27,9 @@ class ConfigProvider
     /**
      * Provide default configuration.
      *
-     * @return array<string, array>
+     * @return RouterConfigShape
      */
-    public function __invoke()
+    public function __invoke(): array
     {
         return [
             'dependencies'  => $this->getDependencyConfig(),

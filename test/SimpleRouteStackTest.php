@@ -285,10 +285,10 @@ final class SimpleRouteStackTest extends TestCase
     public function testHasRoute()
     {
         $stack = new SimpleRouteStack();
-        $this->assertEquals(false, $stack->hasRoute('foo'));
+        $this->assertFalse($stack->hasRoute('foo'));
 
         $stack->addRoute('foo', new TestAsset\DummyRoute());
-        $this->assertEquals(true, $stack->hasRoute('foo'));
+        $this->assertTrue($stack->hasRoute('foo'));
     }
 
     /** @return array<class-string, array{0: array, 1: int}> */

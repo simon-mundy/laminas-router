@@ -36,14 +36,12 @@ class RoutePluginManager extends AbstractPluginManager
      *
      * @var class-string
      */
-    protected $instanceOf = RouteInterface::class;
+    protected string $instanceOf = RouteInterface::class;
 
     /**
-     * Do not share instances. (v3)
-     *
-     * @var bool
+     * Do not share instances.
      */
-    protected $shareByDefault = false;
+    protected bool $shareByDefault = false;
 
     /**
      * Constructor
@@ -62,44 +60,7 @@ class RoutePluginManager extends AbstractPluginManager
     }
 
     /**
-     * Validate a route plugin. (v2)
-     *
-     * @throws InvalidServiceException
-     * @psalm-assert InstanceType $instance
-     */
-    public function validate(mixed $instance): void
-    {
-        if (! $instance instanceof $this->instanceOf) {
-            throw new InvalidServiceException(sprintf(
-                'Plugin of type %s is invalid; must implement %s',
-                get_debug_type($instance),
-                RouteInterface::class
-            ));
-        }
-    }
-
-    /**
-     * Validate a route plugin. (v2)
-     *
-     * @param InstanceType $plugin
-     * @throws Exception\RuntimeException
-     * @psalm-assert InstanceType $instance
-     */
-    public function validatePlugin($plugin)
-    {
-        try {
-            $this->validate($plugin);
-        } catch (InvalidServiceException $e) {
-            throw new Exception\RuntimeException(
-                $e->getMessage(),
-                $e->getCode(),
-                $e
-            );
-        }
-    }
-
-    /**
-     * Pre-process configuration. (v3)
+     * Pre-process configuration.
      *
      * Checks for invokables, and, if found, maps them to the
      * component-specific RouteInvokableFactory; removes the invokables entry
@@ -142,7 +103,7 @@ class RoutePluginManager extends AbstractPluginManager
       * @param array<string, class-string> $invokables
       * @return array<string, class-string>
       */
-    protected function createAliasesForInvokables(array $invokables)
+    protected function createAliasesForInvokables(array $invokables): array
     {
         $aliases = [];
         foreach ($invokables as $name => $class) {
@@ -164,7 +125,7 @@ class RoutePluginManager extends AbstractPluginManager
      * @param array<string, class-string> $invokables
      * @return array<class-string, class-string>
      */
-    protected function createFactoriesForInvokables(array $invokables)
+    protected function createFactoriesForInvokables(array $invokables): array
     {
         $factories = [];
         foreach ($invokables as $name => $class) {

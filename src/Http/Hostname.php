@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace Laminas\Router\Http;
 
 use Laminas\Router\Exception;
-use Laminas\Stdlib\ArrayUtils;
+use Laminas\Router\RouterConfigTrait;
 use Laminas\Stdlib\RequestInterface as Request;
 use Laminas\Uri\UriInterface;
-use Traversable;
 
 use function array_merge;
 use function count;
-use function is_array;
 use function method_exists;
 use function preg_match;
 use function preg_quote;
@@ -21,7 +19,6 @@ use function strlen;
 
 /**
  * Hostname route.
- *
  * Note: the following type is recursive, but Psalm doesn't understand array shape recursion (yet). For now, we only
  *       represented recursion of the 'optional' part type to 1 level, to ease analysis.
  *
@@ -41,6 +38,8 @@ use function strlen;
  */
 class Hostname implements RouteInterface
 {
+    use RouterConfigTrait;
+
     /**
      * Parts of the route.
      *
@@ -87,7 +86,7 @@ class Hostname implements RouteInterface
     /**
      * Create a new hostname route.
      *
-     * @param  string $route
+     * @param string $route
      */
     public function __construct($route, array $constraints = [], array $defaults = [])
     {
@@ -101,32 +100,11 @@ class Hostname implements RouteInterface
      *
      * @see    \Laminas\Router\RouteInterface::factory()
      *
-     * @param  iterable $options
-     * @return Hostname
      * @throws Exception\InvalidArgumentException
      */
-    public static function factory($options = [])
+    public static function factory(iterable $options = []): Hostname
     {
-        if ($options instanceof Traversable) {
-            $options = ArrayUtils::iteratorToArray($options);
-        } elseif (! is_array($options)) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                '%s expects an array or Traversable set of options',
-                __METHOD__
-            ));
-        }
-
-        if (! isset($options['route'])) {
-            throw new Exception\InvalidArgumentException('Missing "route" in options array');
-        }
-
-        if (! isset($options['constraints'])) {
-            $options['constraints'] = [];
-        }
-
-        if (! isset($options['defaults'])) {
-            $options['defaults'] = [];
-        }
+        $options = self::processRouteOptions($options);
 
         return new static($options['route'], $options['constraints'], $options['defaults']);
     }
@@ -134,9 +112,9 @@ class Hostname implements RouteInterface
     /**
      * Parse a route definition.
      *
-     * @param  string $def
-     * @return Parts
+     * @param string $def
      * @throws Exception\RuntimeException
+     * @return Parts
      */
     protected function parseRouteDefinition($def)
     {
@@ -204,10 +182,8 @@ class Hostname implements RouteInterface
     /**
      * Build the matching regex from parsed parts.
      *
-     * @param Parts $parts
      * @param int   $groupIndex
      * @return string
-     * @throws Exception\RuntimeException
      */
     protected function buildRegex(array $parts, array $constraints, &$groupIndex = 1)
     {
@@ -245,12 +221,9 @@ class Hostname implements RouteInterface
     /**
      * Build host.
      *
-     * @param Parts                 $parts
      * @param array<string, string> $mergedParams
      * @param bool                  $isOptional
      * @return string
-     * @throws Exception\RuntimeException
-     * @throws Exception\InvalidArgumentException
      */
     protected function buildHost(array $parts, array $mergedParams, $isOptional)
     {

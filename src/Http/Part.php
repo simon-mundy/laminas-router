@@ -62,7 +62,7 @@ class Part extends TreeRouteStack implements RouteInterface
         $this->routePluginManager = $routePlugins;
 
         if (! $route instanceof RouteInterface) {
-            $route = $this->routeFromArray($route);
+            $route = $this->routeFromIterable($route);
         }
 
         if ($route instanceof self) {
@@ -79,13 +79,12 @@ class Part extends TreeRouteStack implements RouteInterface
     /**
      * factory(): defined by RouteInterface interface.
      *
-     * @see    \Laminas\Router\RouteInterface::factory()
-     *
-     * @param  mixed $options
-     * @return Part
+     * @param  iterable|array $options
      * @throws Exception\InvalidArgumentException
+     * @return Part
+     * @see    \Laminas\Router\RouteInterface::factory()
      */
-    public static function factory($options = [])
+    public static function factory(iterable|array $options = [])
     {
         if ($options instanceof Traversable) {
             $options = ArrayUtils::iteratorToArray($options);
@@ -163,7 +162,7 @@ class Part extends TreeRouteStack implements RouteInterface
             if (
                 isset($options['translator'])
                 && ! isset($options['locale'])
-                && null !== ($locale = $match->getParam('locale', null))
+                && null !== ($locale = $match->getParam('locale'))
             ) {
                 $options['locale'] = $locale;
             }

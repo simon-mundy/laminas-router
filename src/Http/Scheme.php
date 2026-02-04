@@ -89,14 +89,14 @@ class Scheme implements RouteInterface
     public function match(Request $request)
     {
         if (! method_exists($request, 'getUri')) {
-            return;
+            return null;
         }
 
         $uri    = $request->getUri();
         $scheme = $uri->getScheme();
 
         if ($scheme !== $this->scheme) {
-            return;
+            return null;
         }
 
         return new RouteMatch($this->defaults);

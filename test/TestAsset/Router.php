@@ -23,7 +23,7 @@ final class Router implements RouteStackInterface
      */
     public static function factory($options = [])
     {
-        return new static();
+        return new Router();
     }
 
     /**

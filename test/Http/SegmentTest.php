@@ -7,7 +7,7 @@ namespace LaminasTest\Router\Http;
 use Laminas\Http\Request;
 use Laminas\I18n\Translator\Loader\FileLoaderInterface;
 use Laminas\I18n\Translator\TextDomain;
-use Laminas\Translator\TranslatorInterface as Translator;
+use Laminas\I18n\Translator\Translator;
 use Laminas\Router\Exception\InvalidArgumentException;
 use Laminas\Router\Exception\RuntimeException;
 use Laminas\Router\Http\RouteMatch;
@@ -18,6 +18,7 @@ use LaminasTest\Router\FactoryTester;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+use function class_exists;
 use function implode;
 use function strlen;
 use function strpos;
@@ -292,9 +293,6 @@ final class SegmentTest extends TestCase
         ];
     }
 
-    /**
-     * @param array|null $params
-     */
     #[DataProvider('routeProvider')]
     public function testMatching(
         Segment $route,
