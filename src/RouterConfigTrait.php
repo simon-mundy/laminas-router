@@ -13,11 +13,8 @@ trait RouterConfigTrait
 {
     /**
      * Create and return a router instance, by calling the appropriate factory.
-     *
-     * @param string $class
-     * @return RouteInterface
      */
-    private function createRouter($class, array $config, ContainerInterface $container)
+    private function createRouter(string $class, array $config, ContainerInterface $container): RouteInterface
     {
         // Obtain the configured router class, if any
         if (isset($config['router_class']) && class_exists($config['router_class'])) {

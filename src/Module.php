@@ -11,10 +11,8 @@ class Module
 {
     /**
      * Provide default router configuration.
-     *
-     * @return array
      */
-    public function getConfig()
+    public function getConfig(): array
     {
         $provider = new ConfigProvider();
         return [

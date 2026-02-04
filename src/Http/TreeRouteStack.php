@@ -8,7 +8,6 @@ use ArrayObject;
 use Laminas\Router\Exception;
 use Laminas\Router\RouteInvokableFactory;
 use Laminas\Router\SimpleRouteStack;
-use Laminas\ServiceManager\Config;
 use Laminas\Stdlib\ArrayUtils;
 use Laminas\Stdlib\RequestInterface as Request;
 use Laminas\Uri\Http as HttpUri;
@@ -104,7 +103,7 @@ class TreeRouteStack extends SimpleRouteStack
         /** @var ArrayObject<string, TRoute> $this->prototypes */
         $this->prototypes = new ArrayObject();
 
-        (new Config([
+        $this->routePluginManager->configure([
             'aliases'   => [
                 'chain'    => Chain::class,
                 'Chain'    => Chain::class,
@@ -139,19 +138,8 @@ class TreeRouteStack extends SimpleRouteStack
                 Scheme::class   => RouteInvokableFactory::class,
                 Segment::class  => RouteInvokableFactory::class,
                 Wildcard::class => RouteInvokableFactory::class,
-
-                // v2 normalized names
-                'laminasmvcrouterhttpchain'    => RouteInvokableFactory::class,
-                'laminasmvcrouterhttphostname' => RouteInvokableFactory::class,
-                'laminasmvcrouterhttpliteral'  => RouteInvokableFactory::class,
-                'laminasmvcrouterhttpmethod'   => RouteInvokableFactory::class,
-                'laminasmvcrouterhttppart'     => RouteInvokableFactory::class,
-                'laminasmvcrouterhttpregex'    => RouteInvokableFactory::class,
-                'laminasmvcrouterhttpscheme'   => RouteInvokableFactory::class,
-                'laminasmvcrouterhttpsegment'  => RouteInvokableFactory::class,
-                'laminasmvcrouterhttpwildcard' => RouteInvokableFactory::class,
             ],
-        ]))->configureServiceManager($this->routePluginManager);
+        ]);
     }
 
     /**
@@ -211,7 +199,7 @@ class TreeRouteStack extends SimpleRouteStack
                 'prototypes'    => $this->prototypes,
             ];
 
-            $route = $this->routePluginManager->get('chain', $options);
+            $route = $this->routePluginManager->build('chain', $options);
         } else {
             $route = parent::routeFromArray($specs);
         }
@@ -231,7 +219,7 @@ class TreeRouteStack extends SimpleRouteStack
 
             $priority = $route->priority ?? null;
 
-            $route           = $this->routePluginManager->get('part', $options);
+            $route           = $this->routePluginManager->build('part', $options);
             $route->priority = $priority;
         }
 

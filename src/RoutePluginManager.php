@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Laminas\Router;
 
 use Laminas\ServiceManager\AbstractPluginManager;
-use Laminas\ServiceManager\ConfigInterface;
 use Laminas\ServiceManager\Exception\InvalidServiceException;
 use Laminas\ServiceManager\ServiceManager;
 use Psr\Container\ContainerInterface;
@@ -47,25 +46,19 @@ class RoutePluginManager extends AbstractPluginManager
     protected $shareByDefault = false;
 
     /**
-     * Do not share instances. (v2)
-     *
-     * @var bool
-     */
-    protected $sharedByDefault = false;
-
-    /**
      * Constructor
      *
      * Ensure that the instance is seeded with the RouteInvokableFactory as an
      * abstract factory.
      *
-     * @param ContainerInterface|ConfigInterface $configOrContainerInstance
-     * @psalm-param ServiceManagerConfiguration $v3config
+     * @psalm-param ServiceManagerConfiguration $config
      */
-    public function __construct($configOrContainerInstance, array $v3config = [])
+    public function __construct(ContainerInterface $container, array $config = [])
     {
-        $this->addAbstractFactory(RouteInvokableFactory::class);
-        parent::__construct($configOrContainerInstance, $v3config);
+        $config['abstract_factories'] ??= [];
+        $config['abstract_factories'][] = RouteInvokableFactory::class;
+
+        parent::__construct($container, $config);
     }
 
     /**
@@ -74,7 +67,7 @@ class RoutePluginManager extends AbstractPluginManager
      * @throws InvalidServiceException
      * @psalm-assert InstanceType $instance
      */
-    public function validate(mixed $instance)
+    public function validate(mixed $instance): void
     {
         if (! $instance instanceof $this->instanceOf) {
             throw new InvalidServiceException(sprintf(
@@ -115,7 +108,7 @@ class RoutePluginManager extends AbstractPluginManager
      * @psalm-param ServiceManagerConfiguration $config
      * @return $this
      */
-    public function configure(array $config)
+    public function configure(array $config): static
     {
         if (isset($config['invokables']) && ! empty($config['invokables'])) {
             $aliases   = $this->createAliasesForInvokables($config['invokables']);
